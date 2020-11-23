@@ -33,7 +33,7 @@
                     <thead class="bg-danger">
                         <tr>
                             <th><button type="button" name="cashiermoredelete" id="cashiermoredelete"
-                                    class="btn btn-danger btn-sm">
+                                    class="btn btn-secondary btn-sm">
                                     <i class="fas fa-times"></i><span></span>
                                 </button></th>
                             <th></th>

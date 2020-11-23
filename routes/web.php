@@ -59,6 +59,7 @@ Route::prefix('admin')->middleware('auth')->group(function(){
     Route::get('schedulenew', [ScheduleController::class, 'indexnew']);
     Route::get('schedule/datatablecreate', [ScheduleController::class, 'datatablecreate'])->name('schedule.datatablecreate');
     Route::resource('schedule', ScheduleController::class);
+    // Route::get('schedule/create/{position}', [ScheduleController::class, 'create']);
     Route::get('scheduledatatable/destroy/{id}', [ScheduleController::class, 'destroydatatable']);
     Route::post('schedule/day', [ScheduleController::class, 'day']);
 

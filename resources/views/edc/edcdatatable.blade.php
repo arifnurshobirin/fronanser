@@ -30,7 +30,7 @@
                         id="EDCDatatable" style="width:100%">
                         <thead class="bg-danger">
                             <tr>
-                                <th><button type="button" name="edcmoredelete" id="edcmoredelete" class="btn btn-danger btn-sm">
+                                <th><button type="button" name="edcmoredelete" id="edcmoredelete" class="btn btn-secondary btn-sm">
                                 <i class="fas fa-times"></i><span></span>
                                 </button></th>
                                 <th></th>

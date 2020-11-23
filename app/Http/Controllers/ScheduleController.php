@@ -54,8 +54,6 @@ class ScheduleController extends Controller
                     })->get();
         return DataTables::of($dataschedule)
             ->addColumn('EmployeeName', '{{$cashier["employee"]}} - {{$cashier["fullname"]}}')
-            ->addColumn('weeknumber', 'Week {{$id}}')
-            ->addColumn('checkbox', '<input type="checkbox" name="countercheckbox[]" class="checkbox countercheckbox" value="{{$id}}" />')
             ->addColumn('action',
             '<div class="btn-group">
             <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown"><i class="fas fa-wrench"></i> </button>
@@ -64,23 +62,13 @@ class ScheduleController extends Controller
             <a class="scheduleedit dropdown-item" id="{{$id}}" onclick="editschedule({{$id}})"><i class="fas fa-edit"></i> Edit</a>
             <a class="scheduledelete dropdown-item" id="{{$id}}"><i class="fas fa-trash"></i> Delete</a>
             </div></div>')
-            ->rawColumns(['StatusCashier','checkbox','EmployeeName','action'])
+            ->rawColumns(['StatusCashier','EmployeeName','action'])
             ->editColumn('cashier.status', function ($Schedule) {
                 if ($Schedule->cashier['status'] == 'Active') return '<span class="badge badge-primary">' .$Schedule->cashier['status'].'</span>';
                 if ($Schedule->cashier['status'] == 'Inactive') return '<span class="badge badge-danger">' .$Schedule->cashier['status'].'</span>';
                 return 'Null';
             })
             ->escapeColumns('cashier.status')
-
-            // ->filter(function ($query) use ($request) {
-            //         if ($request->has('position')) {
-            //             $query->where('position', 'like', "%{$request->get('position')}%");
-            //         }
-
-            //         if ($request->has('status')) {
-            //             $query->where('status', 'like', "%{$request->get('status')}%");
-            //         }
-            //     })
             ->make(true);
     }
 
@@ -98,12 +86,12 @@ class ScheduleController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Request $request)
     {
-         // $dataschedule = Schedule::latest()->get();
-         // $datacashier = Cashier::latest()->get();
-        $dataworkinghour = Shift::all();
-        return view('schedule.schedulecreate',compact('dataworkinghour'));
+         // $dataschedule = Schedule::latest()->get();;where('position',$positiontable)->
+        $positiontable = $request->position;
+        $datacashier = Cashier::whereIn('position',$positiontable)->where('status','Active')->get();
+        return response()->json($datacashier);
     }
 
     public function indexnew()
@@ -210,7 +198,7 @@ class ScheduleController extends Controller
      */
     public function edit($id)
     {
-        $data = Schedule::find($id);
+        $data = Schedule::with(['cashier' ,'shift'])->find($id);
         return response()->json($data);
     }
 

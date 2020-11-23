@@ -44,14 +44,14 @@
                     <label>Filter :</label>
                     <div class="row">
                         <div class="col-md-3">
-                            <input type="text" class="form-control" id="dateinput" name="dateinput" placeholder="Select a date">
+                            <input type="text" class="form-control" id="dateinput" name="dateinput" placeholder="Select a date" required>
                             <input type="text" class="form-control" id="weekinput" name="weekinput" placeholder="Week Number">
                         </div>
                         <div class="col-md-3">
                             {{-- <input type="text" class="form-control" id="position" name="position"> --}}
                             <div class="select2-danger">
                                 <select data-column="3" class="form-control select2" multiple="multiple" data-placeholder="Select a Position" style="width: 100%;"
-                                data-dropdown-css-class="select2-danger" id="positionselect" name="positionselect">
+                                data-dropdown-css-class="select2-danger" id="positionselect" name="positionselect" required>
                                     <option value="Cashier">Cashier</option>
                                     <option value="Customer Service">Customer Service</option>
                                     <option value="TDR">TDR</option>
@@ -64,17 +64,15 @@
                             {{-- <input type="text" class="form-control" id="status" name="status"> --}}
                             <div class="select2-danger">
                                 <select data-column="5" class="form-control select2" multiple="multiple" data-placeholder="Select a Status" style="width: 100%;"
-                                data-dropdown-css-class="select2-danger" id="statusselect" name="statusselect">
+                                data-dropdown-css-class="select2-danger" id="statusselect" name="statusselect" required>
                                     <option value="Active">Active</option>
                                     <option value="Inactive">Inactive</option>
                                 </select>
                             </div>
                         </div>
                         <div class="col-md-3">
-                            <button type="submit" name="saveschedulebutton" id="saveschedulebutton" class="btn btn-success"
-                                value="create">
-                                Show Schedule
-                            </button>
+                            <button type="submit" name="showschedule" id="showschedule" class="btn btn-success">Show</button>
+                            <button type="button" name="createschedule" id="createschedule" class="btn btn-info createschedule">Create</button>
                         </div>
                     </div>
                 </div>
@@ -85,11 +83,6 @@
                     id="ScheduleDatatable" style="width:100%">
                     <thead class="bg-danger">
                         <tr>
-                            <th><button type="button" name="schedulemoredelete" id="schedulemoredelete"
-                                    class="btn btn-secondary btn-sm">
-                                    <i class="fas fa-times"></i><span></span>
-                                </button></th>
-                            <th></th>
                             <th>Employee Name</th>
                             <th>Position</th>
                             <th>Week Number</th>
@@ -97,10 +90,10 @@
                             <th>Action</th>
                         </tr>
                     </thead>
+                    <tbody id="bodytable">
+                    </tbody>
                     <tfoot class="bg-danger">
                         <tr>
-                            <th></th>
-                            <th></th>
                             <th>Employee Name</th>
                             <th>Position</th>
                             <th>Week Number</th>
@@ -124,12 +117,10 @@
                             <div class="card card-danger card-outline">
                                 <div class="card-body box-profile">
                                     <div class="text-center">
-                                        <img class="profile-user-img img-fluid img-circle"
-                                            src="{{ asset('dashboard/img/userarif160x160.jpg') }}"
-                                            alt="User profile picture">
+                                        <img class="profile-user-img img-fluid img-circle" id="avatarschedule" src="{{ asset('dashboard/img/avatar.png') }}" alt="User">
                                     </div>
-                                    <h3 class="profile-username text-center">Arif Nur Shobirin</h3>
-                                    <p class="text-muted text-center">Senior Cashier</p>
+                                    <h3 class="profile-username text-center" id="fullnameschedule">Null</h3>
+                                    <p class="text-muted text-center" id="positionschedule">Null</p>
                                     <form method="post" id="scheduleformcreate" name="scheduleformcreate">
                                         @csrf
                                     <div class="form-group row">
@@ -320,36 +311,6 @@
 <!-- page script -->
 <script>
     $(".preloader").fadeOut("slow");
-function format ( d ) {
-    // `d` is the original data object for the row
-    return '<table cellpadding="5" cellspacing="0" border="0" style="padding-left:50px;">'+
-        '<tr>'+
-            '<td>Working Date : </td>'+
-            '<td>'+d.id+'</td>'+
-            '<td>'+d.id+'</td>'+
-            '<td>'+d.id+'</td>'+
-            '<td>'+d.id+'</td>'+
-            '<td>'+d.id+'</td>'+
-            '<td>'+d.id+'</td>'+
-            '<td>'+d.id+'</td>'+
-        '</tr>'+
-        '<tr>'+
-            '<td>Working Shift : </td>'+
-            '<td>'+'A7'+'</td>'+
-            '<td>'+'A7'+'</td>'+
-            '<td>'+'A7'+'</td>'+
-            '<td>'+'OFF'+'</td>'+
-            '<td>'+'A7'+'</td>'+
-            '<td>'+'A7'+'</td>'+
-            '<td>'+'A7'+'</td>'+
-        '</tr>'+
-        '<tr>'+
-            '<td>Working Hour :</td>'+
-            '<td id=childhourmon'+d.id+'></td>'+
-            '<td id=childhour'+d.id+'> Hour</td>'+
-        '</tr>'+
-    '</table>';
-}
 
 function datashift(day){
     var datajs = {!! json_encode($datashift->toArray()) !!};
@@ -400,115 +361,110 @@ function datashift(day){
             });
 
         $('#scheduleform').on("submit",function (event) {
-        event.preventDefault();
-        // console.log(document.getElementById("scheduleshow"));
-        // console.log($(this)[0]);
-        var formdata = new FormData($(this)[0]);
-        // console.log(formdata);
-        var table = $('#ScheduleDatatable').DataTable({
-            destroy: true,
-            // retrieve: true,
-            processing: true,
-            serverSide: true,
-            ajax: {
-                url:"{{ route('schedule.datatablepost') }}",
-                type: "POST",
-                data: function ( d ) {
-                        d.week = $('#weekinput').val();
-                        d.position = $('#positionselect').val();
-                        d.status = $('#statusselect').val();
+            event.preventDefault();
+            // console.log(document.getElementById("scheduleshow"));
+            // console.log($(this)[0]);
+            var formdata = new FormData($(this)[0]);
+            // console.log(formdata);
+            var table = $('#ScheduleDatatable').DataTable({
+                destroy: true,
+                // retrieve: true,
+                processing: true,
+                serverSide: true,
+                ajax: {
+                    url:"{{ route('schedule.datatablepost') }}",
+                    type: "POST",
+                    data: function ( d ) {
+                            d.week = $('#weekinput').val();
+                            d.position = $('#positionselect').val();
+                            d.status = $('#statusselect').val();
+                            }
+                    // processData: false,
+                    // contentType: false
+                    },
+                columns: [
+                    { data: 'EmployeeName', name: 'EmployeeName' },
+                    { data: 'cashier.position', name: 'cashier.position' },
+                    { data: 'week', name: 'week' },
+                    { data: 'cashier.status', name: 'cashier.status' },
+                    { data: 'action', name: 'action', orderable: false}
+                ],
+                order: [[ 0, "asc" ]],
+                dom: 'Bfrtip',
+                lengthMenu: [
+                [ 10, 25, 50, -1 ],
+                [ '10 rows', '25 rows', '50 rows', 'Show all' ]
+                ],
+                buttons:['pageLength',
+                    {
+                        extend: 'collection',
+                        text: 'Export',
+                        className: 'btn btn-info',
+                        buttons:[ 'copy', 'csv', 'excel', 'pdf', 'print',
+                                    {
+                                        collectionTitle: 'Visibility control',
+                                        extend: 'colvis',
+                                        collectionLayout: 'two-column'
+                                    }
+                                ]
+                    },
+                    {
+                        text: '<i class="fas fa-user-clock"></i><span> Code Shift</span>',
+                        className: 'btn btn-success',
+                        action: function ( e, dt, node, config ) {
+                            $('#schedulesave').val("create-schedule");
+                            $('#schedulesave').html('Save');
+                            $('#scheduleid').val('');
+                            $('#scheduleform').trigger("reset");
+                            $('#modelHeading').html("Create New Schedule");
+                            $('#codeshiftmodal').modal('show');
                         }
-                // processData: false,
-                // contentType: false
-                },
-            columns: [
-                { data: 'checkbox', name: 'checkbox', orderable:false, searchable: false},
-                {
-                "className":      'details-control',
-                "orderable":      false,
-                "searchable":     false,
-                "data":           null,
-                "defaultContent": ''
-                },
-                { data: 'EmployeeName', name: 'EmployeeName' },
-                { data: 'cashier.position', name: 'cashier.position' },
-                { data: 'week', name: 'week' },
-                { data: 'cashier.status', name: 'cashier.status' },
-                { data: 'action', name: 'action', orderable: false}
-            ],
-            order: [[ 2, "asc" ]],
-            dom: 'Bfrtip',
-            lengthMenu: [
-            [ 10, 25, 50, -1 ],
-            [ '10 rows', '25 rows', '50 rows', 'Show all' ]
-            ],
-            buttons:['pageLength',
-                {
-                    extend: 'collection',
-                    text: 'Export',
-                    className: 'btn btn-info',
-                    buttons:[ 'copy', 'csv', 'excel', 'pdf', 'print',
-                                {
-                                    collectionTitle: 'Visibility control',
-                                    extend: 'colvis',
-                                    collectionLayout: 'two-column'
-                                }
-                            ]
-                },
-                {
-                    text: '<i class="fas fa-user-clock"></i><span> Code Shift</span>',
-                    className: 'btn btn-success',
-                    action: function ( e, dt, node, config ) {
-                        $('#schedulesave').val("create-schedule");
-                        $('#schedulesave').html('Save');
-                        $('#scheduleid').val('');
-                        $('#scheduleform').trigger("reset");
-                        $('#modelHeading').html("Create New Schedule");
-                        $('#codeshiftmodal').modal('show');
                     }
+                ]
+            });
+        });
+
+        $(document).on('click', '.createschedule', function () {
+            var position = $('#positionselect').val();
+            $.ajax({
+                url: "{{ route('schedule.create') }}",
+                type: "GET",
+                data: {'position': position },
+                // processData: false,
+                // contentType: false,
+                success: function (data) {
+
+                    var objectcashier= data;
+                    var linkimage="{{ asset('dashboard/img/')}}";
+
+                    objectcashier.forEach(function(datatablecashier, data){
+                        $('#bodytable').append("<tr>"+
+                                                "<td>"+datatablecashier.fullname+"</td>"+
+                                                "<td>"+datatablecashier.idcard+"</td>"+
+                                                "<td>"+datatablecashier.joindate+"</td>"+
+                                                "<td>"+datatablecashier.position+"</td>"+
+                                                "<td>"+datatablecashier.status+"</td> </tr>");
+                    })
+                },
+                error: function (data) {
+                    console.log('Error:', data);
                 }
-            ]
+            });
         });
 
-         // Add event listener for opening and closing details
-        $('#ScheduleDatatable').on('click', 'td.details-control', function () {
-            var tr = $(this).closest('tr');
-            var row = table.row( tr );
-
-            if ( row.child.isShown() ) {
-                // This row is already open - close it
-                row.child.hide();
-                tr.removeClass('shown');
-            }
-            else {
-                // Open this row
-                row.child( format(row.data()) ).show();
-                tr.addClass('shown');
-            }
-        });
-        });
-        // $('#saveallschedule').on('click', function() {
-        // table.draw();
-        // e.preventDefault();
-
-        // });
 
         $(document).on('click', '.scheduleedit', function () {
             var scheduleid = $(this).attr('id');
             $.get("{{ route('schedule.index') }}" +'/' + scheduleid +'/edit', function (data)
             {
+                var linkimage="{{ asset('dashboard/img/')}}";
                 $('#modelHeading').html("Edit Data Schedule");
-                $('#schedulesave').val("edit-schedule");
                 $('#schedulesave').html('Save Changes');
-                $('#schedulemodal').modal('show');
                 $('#scheduleid').val(data.id);
-                $('#emp').val(data.Employee);
-                $('#name').val(data.FullName);
-                $('#birth').val(data.DateOfBirth);
-                $('#address').val(data.Address);
-                $('#phone').val(data.PhoneNumber);
-                $('#position').val(data.Position);
-                $('#join').val(data.JoinDate);
+                $('#avatarschedule').attr('src','../../dashboard/img/'+data.cashier.avatar);
+                $('#fullnameschedule').html(data.cashier.fullname);
+                $('#positionschedule').html(data.cashier.position);
+                $('#schedulemodal').modal('show');
             })
         });
 
@@ -526,7 +482,6 @@ function datashift(day){
         $('#scheduleformAAAA').on("submit",function (event) {
             event.preventDefault();
             var formdata = new FormData($(this)[0]);
-            console.log(formdata);
             $.ajax({
                 url: "{{ route('schedule.store') }}",
                 type: "POST",

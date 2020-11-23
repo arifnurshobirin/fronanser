@@ -31,7 +31,7 @@
                     <thead class="bg-danger">
                         <tr>
                             <th><button type="button" name="countermoredelete" id="countermoredelete"
-                                    class="btn btn-danger btn-sm">
+                                    class="btn btn-secondary btn-sm">
                                     <i class="fas fa-times"></i><span></span>
                                 </button></th>
                             <th></th>
@@ -284,11 +284,11 @@
                 $('#countersave').html('Save Changes');
                 $('#ajaxModel').modal('show');
                 $('#counterid').val(data.id);
-                $('#nocounter').val(data.NoCounter);
-                $('#ipaddress').val(data.IpAddress);
-                $('#macaddress').val(data.MacAddress);
-                $('#typecounter').val(data.TypeCounter);
-                $('#Status').val(data.Status);
+                $('#nocounter').val(data.nocounter);
+                $('#ipaddress').val(data.ipaadress);
+                $('#macaddress').val(data.macaddress);
+                $('#typecounter').val(data.type);
+                $('#Status').val(data.status);
             })
         });
 
