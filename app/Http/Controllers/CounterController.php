@@ -17,8 +17,8 @@ class CounterController extends Controller
      */
     public function datatable(Request $request)
     {
-        $data = Counter::latest()->get();
-            return DataTables::of($data)
+        $datacounter = Counter::latest()->get();
+            return DataTables::of($datacounter)
             ->addColumn('action',
             '<div class="btn-group">
             <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown"><i class="fas fa-wrench"></i> </button>
@@ -28,14 +28,15 @@ class CounterController extends Controller
             <a href="#" class="counterdelete dropdown-item" id="{{$id}}"><i class="fas fa-trash"></i> Delete</a>
             </div></div>')
             ->addColumn('checkbox', '<input type="checkbox" name="countercheckbox[]" class="checkbox countercheckbox" value="{{$id}}" />')
-            // ->addColumn('status', function($data) {
-            //     if($data->is_active == '1'){
-            //         return '<label class="badge badge-success">Active</label>';
-            //     }else{
-            //         return '<label class="badge badge-danger">Inactive</label>';
-            //     }
-            // })
             ->rawColumns(['checkbox','action'])
+            ->editColumn('status', function ($datacounter) {
+                if ($datacounter->status == 'Queueing') return '<span class="badge badge-danger">' .$datacounter->status.'</span>';
+                if ($datacounter->status == 'Active') return '<span class="badge badge-success">' .$datacounter->status.'</span>';
+                if ($datacounter->status == 'Inactive') return '<span class="badge badge-warning">' .$datacounter->status.'</span>';
+                if ($datacounter->status == 'Broken') return '<span class="badge badge-secondary">' .$datacounter->status.'</span>';
+                return 'Null';
+            })
+            ->escapeColumns('status')
             ->make(true);
 
     }

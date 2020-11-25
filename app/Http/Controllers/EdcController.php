@@ -7,7 +7,7 @@ use DataTables;
 use App\DataTables\EdcsDataTable;
 use Illuminate\Http\Request;
 //use Validator;
-// Use Alert;
+Use Alert;
 
 class EdcController extends Controller
 {
@@ -26,11 +26,6 @@ class EdcController extends Controller
     public function datatable(Request $request)
     {
         $dataedc = Edc::with('counter')->latest()->get();
-        // $dataconsolidate = Consolidate::with('cashiers')->latest()->get();
-        //$caricounter=array_column($dataedc, 'id');
-        //$carinocounter =  $dataedc->id_counter->counter();
-        //  dd($dataedc);
-        //return $dataedc;
         return DataTables::of($dataedc)
         ->addColumn('action','<div class="btn-group">
             <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown"><i class="fas fa-wrench"></i> </button>
@@ -40,8 +35,15 @@ class EdcController extends Controller
             <a href="#" class="deleteedc dropdown-item" id="{{$id}}"><i class="fas fa-trash"></i> Delete</a>
             </div></div>')
         ->addColumn('checkbox', '<input type="checkbox" name="edccheckbox[]" class="edccheckbox" value="{{$id}}" />')
-        //->addColumn('nocounter', '<input type="checkbox" name="edccheckbox[]" class="edccheckbox" value="{{$counter->NoCounter}}" />')
         ->rawColumns(['action','checkbox'])
+        ->editColumn('status', function ($dataedc) {
+            if ($dataedc->status == 'Active') return '<span class="badge badge-success">' .$dataedc->status.'</span>';
+            if ($dataedc->status == 'Inactive') return '<span class="badge badge-warning">' .$dataedc->status.'</span>';
+            if ($dataedc->status == 'Lock') return '<span class="badge badge-danger">' .$dataedc->status.'</span>';
+            if ($dataedc->status == 'Broken') return '<span class="badge badge-secondary">' .$dataedc->status.'</span>';
+            return 'Null';
+        })
+        ->escapeColumns('status')
         ->make(true);
 
     }
@@ -73,14 +75,14 @@ class EdcController extends Controller
     public function store(Request $request)
     {
         $attr=$request->validate([
-            'TIDEDC' => 'required|min:5',
-            'MIDEDC' => 'required|string',
-            'IPAdress' => 'required',
+            'tidedc' => 'required|min:5',
+            'midedc' => 'required|string',
+            'ipaddress' => 'required',
             'counter_id' => 'required',
-            'Connection' => 'required',
-            'SIMCard' => 'required',
-            'TypeEDC' => 'required',
-            'Status' => 'required'
+            'connection' => 'required',
+            'simcard' => 'required',
+            'type' => 'required',
+            'status' => 'required'
         ]);
 
         // $form_data = array(
@@ -96,8 +98,7 @@ class EdcController extends Controller
 
 
 
-        //Edc::updateOrCreate(['id'=>$request->id],$attr);
-        Edc::Create($attr);
+        Edc::updateOrCreate(['id'=>$request->id],$attr);
 
         return back()->with('success', 'Success Message');
     }

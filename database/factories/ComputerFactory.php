@@ -30,7 +30,7 @@ class ComputerFactory extends Factory
             'drawer' =>$this->faker->randomElement($array = array ('Wincore','IBM','HP')),
             'scanner' =>$this->faker->randomElement($array = array ('Magellan 8100', 'Magellan 2000','Datalogic','Zonerich','HP')),
             'monitor' =>$this->faker->randomElement($array = array ('TFT', 'HP','Wincore')),
-            'status' => $this->faker->randomElement($array = array ('Active', 'Inaktive','Broken'))
+            'status' => $this->faker->randomElement($array = array ('Active', 'Inactive','Broken'))
         ];
     }
 }

@@ -18,8 +18,8 @@ class ComputerController extends Controller
      */
     public function datatable(Request $request)
     {
-        $data = Computer::latest()->get();
-            return DataTables::of($data)
+        $datacomputer = Computer::with('counter')->latest()->get();
+            return DataTables::of($datacomputer)
             ->addColumn('action',
                 '<div class="btn-group">
                 <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown"><i class="fas fa-wrench"></i> </button>
@@ -30,6 +30,13 @@ class ComputerController extends Controller
                 </div></div>')
             ->addColumn('checkbox', '<input type="checkbox" name="computercheckbox[]" class="computercheckbox" value="{{$id}}" />')
             ->rawColumns(['checkbox','action'])
+            ->editColumn('status', function ($datacomputer) {
+                if ($datacomputer->status == 'Active') return '<span class="badge badge-success">' .$datacomputer->status.'</span>';
+                if ($datacomputer->status == 'Inactive') return '<span class="badge badge-warning">' .$datacomputer->status.'</span>';
+                if ($datacomputer->status == 'Broken') return '<span class="badge badge-secondary">' .$datacomputer->status.'</span>';
+                return 'Null';
+            })
+            ->escapeColumns('status')
             ->make(true);
     }
 

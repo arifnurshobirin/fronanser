@@ -30,7 +30,7 @@ class EdcFactory extends Factory
             'connection' =>$this->faker->randomElement($array = array ('GPRS', 'LAN')),
             'simcard' => $this->faker->randomElement($array = array ('Indosat', 'Telkomsel','XL')),
             'type' => $this->faker->randomElement($array = array ('WireCard', 'BCA','Spots')),
-            'status' => $this->faker->randomElement($array = array ('Active', 'Inaktive','Broken'))
+            'status' => $this->faker->randomElement($array = array ('Active', 'Inactive','Broken'))
         ];
     }
 }

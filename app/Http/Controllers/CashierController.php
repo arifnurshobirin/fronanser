@@ -18,8 +18,8 @@ class CashierController extends Controller
      */
     public function datatable()
     {
-        $data = Cashier::latest()->get();
-            return DataTables::of($data)
+        $datacashier = Cashier::latest()->get();
+            return DataTables::of($datacashier)
             ->addColumn('action',
                 '<div class="btn-group">
                 <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown"><i class="fas fa-wrench"></i> </button>
@@ -30,6 +30,12 @@ class CashierController extends Controller
                 </div></div>')
             ->addColumn('checkbox', '<input type="checkbox" name="cashiercheckbox[]" class="cashiercheckbox" value="{{$id}}" />')
             ->rawColumns(['checkbox','action'])
+            ->editColumn('status', function ($datacashier) {
+                if ($datacashier->status == 'Active') return '<span class="badge badge-success">' .$datacashier->status.'</span>';
+                if ($datacashier->status == 'Inactive') return '<span class="badge badge-warning">' .$datacashier->status.'</span>';
+                return 'Null';
+            })
+            ->escapeColumns('status')
             ->make(true);
 
     }
@@ -122,9 +128,14 @@ class CashierController extends Controller
      * @param  \App\Cashier  $Cashier
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Cashier $Cashier)
+    public function update($id)
     {
-        //
+        $data = Cashier::find($id)->update(['status' => 'Inactive',]);
+        // $data = Cashier::find($id);
+        // $$data->status = "Inactive";
+        // $data->save();
+        // $data = Cashier::update(['id'=>$id],['status'=>'Inactive']);
+        return response()->json($data);
     }
 
     /**
@@ -141,6 +152,6 @@ class CashierController extends Controller
     public function moredelete(Request $request)
     {
         $idarray = $request->input('id');
-        $pos = Cashier::whereIn('id',$idarray)->delete();
+        Cashier::whereIn('id',$idarray)->delete();
     }
 }

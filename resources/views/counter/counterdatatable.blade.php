@@ -59,11 +59,12 @@
             </div>
 
             <!-- Create Table -->
-            <div class="modal fade" id="ajaxModel" aria-hidden="true">
+            <div class="modal fade" id="countermodal"  data-backdrop="static" aria-hidden="true">
                 <div class="modal-dialog">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h4 class="modal-title" id="modelHeading"></h4>
+                            <h4 class="modal-title" id="modelHeading">Create Counter</h4>
+                            <button type="button" class="btn btn-secondary" id="resetmodal" data-dismiss="modal"><i class='fas fa-times'></i> Close</button>
                         </div>
                         <div class="modal-body">
                             <form method="post" id="counterform" name="counterform">
@@ -93,7 +94,7 @@
                                 <label for="type">Type Counter</label>
                                 <div class="form-group">
                                     <div class="form-line">
-                                        <select class="form-control show-tick" id="typecounter" name="typecounter">
+                                        <select class="custom-select" id="typecounter" name="typecounter">
                                             <option value="">-- Please select --</option>
                                             <option value="Regular">Regular</option>
                                             <option value="SaladBar">SaladBar</option>
@@ -117,7 +118,7 @@
                                 <label for="type">Status Counter</label>
                                 <div class="form-group">
                                     <div class="form-line">
-                                        <select class="form-control show-tick" id="statuscounter" name="statuscounter">
+                                        <select class="custom-select" id="statuscounter" name="statuscounter">
                                             <option value="">-- Please select --</option>
                                             <option value="Queueing">Queueing</option>
                                             <option value="Active">Active</option>
@@ -154,12 +155,12 @@
     // `d` is the original data object for the row
     return '<table cellpadding="5" cellspacing="0" border="0" style="padding-left:50px;">'+
         '<tr>'+
-            '<td>Full name:</td>'+
-            '<td>'+d.TypeCounter+'</td>'+
+            '<td>type Counter:</td>'+
+            '<td>'+d.type+'</td>'+
         '</tr>'+
         '<tr>'+
-            '<td>Extension number:</td>'+
-            '<td>'+d.Status+'</td>'+
+            '<td>Status :</td>'+
+            '<td>'+d.status+'</td>'+
         '</tr>'+
         '<tr>'+
             '<td>Extra info:</td>'+
@@ -226,7 +227,7 @@
                                 $('#counterid').val('');
                                 $('#counterform').trigger("reset");
                                 $('#modelHeading').html("Create New Counter");
-                                $('#ajaxModel').modal('show');
+                                $('#countermodal').modal('show');
                             }
                         }
                     ]
@@ -263,7 +264,7 @@
                 success: function (data) {
 
                     $('#counterform').trigger("reset");
-                    $('#ajaxModel').modal('hide');
+                    $('#countermodal').modal('hide');
                     $('#possave').html('Save');
                     table.draw();
                     swal.fire("Good job!", "You success update Counter!", "success");
@@ -285,10 +286,10 @@
                 $('#ajaxModel').modal('show');
                 $('#counterid').val(data.id);
                 $('#nocounter').val(data.nocounter);
-                $('#ipaddress').val(data.ipaadress);
+                $('#ipaddress').val(data.ipaddress);
                 $('#macaddress').val(data.macaddress);
                 $('#typecounter').val(data.type);
-                $('#Status').val(data.status);
+                $('#statuscounter').val(data.status);
             })
         });
 
@@ -297,9 +298,8 @@
                 $('#contentpage').load('counter'+'/'+id);
         });
 
-            var counterid;
-            $(document).on('click', '.counterdelete', function(){
-            counterid = $(this).attr('id');
+        $(document).on('click', '.counterdelete', function(){
+            var counterid = $(this).attr('id');
             swal.fire({
                 title: "Are you sure?",
                 text: "You will not be able to recover this Counter file!",

@@ -34,11 +34,9 @@
                                 </button></th>
                             <th></th>
                             <th>No Computer</th>
+                            <th>No Counter</th>
                             <th>Type</th>
-                            <th>Printer</th>
-                            <th>Drawer</th>
-                            <th>Scanner</th>
-                            <th>Monitor</th>
+                            <th>Status</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -47,11 +45,9 @@
                             <th></th>
                             <th></th>
                             <th>No Computer</th>
+                            <th>No Counter</th>
                             <th>Type</th>
-                            <th>Printer</th>
-                            <th>Drawer</th>
-                            <th>Scanner</th>
-                            <th>Monitor</th>
+                            <th>Status</th>
                             <th>Action</th>
                         </tr>
                     </tfoot>
@@ -59,11 +55,12 @@
             </div>
 
             <!-- Create Table -->
-            <div class="modal fade" id="ajaxModel" aria-hidden="true">
+            <div class="modal fade" id="computermodal" data-backdrop="static" aria-hidden="true">
                 <div class="modal-dialog">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h4 class="modal-title" id="modelHeading"></h4>
+                            <h4 class="modal-title" id="modelHeading">Create Computer</h4>
+                            <button type="button" class="btn btn-secondary" id="resetmodal" data-dismiss="modal"><i class='fas fa-times'></i> Close</button>
                         </div>
                         <div class="modal-body">
                             <form method="post" id="computerform" name="computerform">
@@ -79,7 +76,7 @@
                                 <label for="cpu">CPU Computer</label>
                                 <div class="form-group">
                                     <div class="form-line">
-                                        <select class="form-control show-tick" id="cpu" name="cpu">
+                                        <select class="custom-select" id="cpu" name="cpu">
                                             <option value="">-- Please select --</option>
                                             <option value="Zonerich">Zonerich</option>
                                             <option value="IBM">IBM</option>
@@ -93,7 +90,7 @@
                                 <label for="printer">Printer</label>
                                 <div class="form-group">
                                     <div class="form-line">
-                                        <select class="form-control show-tick" id="printer" name="printer">
+                                        <select class="custom-select" id="printer" name="printer">
                                             <option value="">-- Please select --</option>
                                             <option value="ND 77">ND 77</option>
                                             <option value="Star">Star</option>
@@ -108,7 +105,7 @@
                                 <label for="scanner">Scanner</label>
                                 <div class="form-group">
                                     <div class="form-line">
-                                        <select class="form-control show-tick" id="scanner" name="scanner">
+                                        <select class="custom-select" id="scanner" name="scanner">
                                             <option value="">-- Please select --</option>
                                             <option value="Magellan 8100">Magellan 8100</option>
                                             <option value="Magellan 2000">Magellan 2000</option>
@@ -122,7 +119,7 @@
                                 <label for="drawer">Drawer</label>
                                 <div class="form-group">
                                     <div class="form-line">
-                                        <select class="form-control show-tick" id="drawer" name="drawer">
+                                        <select class="custom-select" id="drawer" name="drawer">
                                             <option value="">-- Please select --</option>
                                             <option value="Wincore">Wincore</option>
                                             <option value="IBM">IBM</option>
@@ -134,7 +131,7 @@
                                 <label for="monitor">Monitor</label>
                                 <div class="form-group">
                                     <div class="form-line">
-                                        <select class="form-control show-tick" id="monitor" name="monitor">
+                                        <select class="custom-select" id="monitor" name="monitor">
                                             <option value="">-- Please select --</option>
                                             <option value="TFT">TFT</option>
                                             <option value="HP">HP</option>
@@ -169,17 +166,21 @@
         // `d` is the original data object for the row
         return '<table cellpadding="5" cellspacing="0" border="0" style="padding-left:50px;">'+
             '<tr>'+
-                '<td>Full name:</td>'+
-                '<td>'+d.Printer+'</td>'+
+                '<td>Monitor:</td>'+
+                '<td>'+d.monitor+'</td>'+
             '</tr>'+
             '<tr>'+
-                '<td>Extension number:</td>'+
-                '<td>'+d.Printer+'</td>'+
+                '<td>scanner:</td>'+
+                '<td>'+d.scanner+'</td>'+
             '</tr>'+
             '<tr>'+
-                '<td>Extra info:</td>'+
-                '<td>And any further details here (images etc)...</td>'+
+                '<td> printer:</td>'+
+                '<td>'+d.printer+'</td>'+
             '</tr>'+
+            '<trd>'+
+                '<td> Drawer:</td>'+
+                '<td>'+d.drawer+'</td>'+
+            '</trd'+
         '</table>';
     }
     $(document).ready(function() {
@@ -205,11 +206,9 @@
                 "defaultContent": ''
             },
             { data: 'nocomputer', name: 'nocomputer' },
+            { data: 'counter.nocounter', name: 'counter.nocounter' },
             { data: 'type', name: 'type' },
-            { data: 'printer', name: 'printer' },
-            { data: 'drawer', name: 'drawer' },
-            { data: 'scanner', name: 'scanner' },
-            { data: 'monitor', name: 'monitor' },
+            { data: 'status', name: 'status' },
             { data: 'action', name: 'action', orderable: false,searchable: false}
             ],
         dom: 'Bfrtip',
@@ -240,7 +239,7 @@
                             $('#computerid').val('');
                             $('#computerform').trigger("reset");
                             $('#modelHeading').html("Create New Computer");
-                            $('#ajaxModel').modal('show');
+                            $('#computermodal').modal('show');
                         }
                     }
                 ]
@@ -283,7 +282,7 @@
                 success: function (data) {
 
                     $('#computerform').trigger("reset");
-                    $('#ajaxModel').modal('hide');
+                    $('#computermodal').modal('hide');
                     $('#computersave').html('Save');
                     table.draw();
                     swal.fire("Good job!", "You success update Computer!", "success");

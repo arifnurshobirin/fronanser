@@ -34,11 +34,11 @@
                                 <i class="fas fa-times"></i><span></span>
                                 </button></th>
                                 <th></th>
-                                <th>TID EDC</th>
+                                <th>TID</th>
                                 <th>No Counter</th>
                                 <th>Connection</th>
-                                <th>SIM Card</th>
-                                <th>Type EDC</th>
+                                <th>Type</th>
+                                <th>Status</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -46,11 +46,11 @@
                             <tr>
                                 <th></th>
                                 <th></th>
-                                <th>TID EDC</th>
+                                <th>TID</th>
                                 <th>No Counter</th>
                                 <th>Connection</th>
-                                <th>SIM Card</th>
-                                <th>Type EDC</th>
+                                <th>Type</th>
+                                <th>Status</th>
                                 <th>Action</th>
                             </tr>
                         </tfoot>
@@ -71,7 +71,7 @@
                     <label for="tid">TID EDC</label>
                     <div class="form-group">
                         <div class="form-line">
-                            <input type="text" id="tidedc" name="TIDEDC" class="form-control" placeholder="Enter your TID EDC">
+                            <input type="text" id="tidedc" name="tidedc" class="form-control" placeholder="Enter your TID EDC">
                         </div>
                         @error('TIDEDC')
                             <div class="text-danger mt-2">
@@ -82,7 +82,7 @@
                     <label for="mid">MID EDC</label>
                     <div class="form-group">
                         <div class="form-line">
-                            <input type="text" id="midedc" name="MIDEDC" class="form-control" placeholder="Enter your MID EDC">
+                            <input type="text" id="midedc" name="midedc" class="form-control" placeholder="Enter your MID EDC">
                         </div>
                         @error('MIDEDC')
                             <div class="text-danger mt-2">
@@ -93,7 +93,7 @@
                     <label for="ipaddress">IP Adress</label>
                     <div class="form-group">
                         <div class="form-line">
-                            <input type="text" id="ipedc" name="IPAdress" class="form-control" placeholder="Enter your IP Adress">
+                            <input type="text" id="ipedc" name="ipadress" class="form-control" placeholder="Enter your IP Adress">
                         </div>
                         @error('IPAdress')
                         <div class="text-danger mt-2">
@@ -106,7 +106,7 @@
                         <div class="form-line">
                             <select class="custom-select" id="selectnocounter" name="counter_id">
                                 @foreach($datacounter as $counter)
-                                <option value="{{$counter->id}}">{{$counter->NoCounter}}</option>
+                                <option value="{{$counter->id}}">{{$counter->nocounter}}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -119,7 +119,7 @@
                     <label for="connection">Connection</label>
                     <div class="form-group">
                         <div class="form-line">
-                            <select class="form-control show-tick" id="connection" name="Connection">
+                            <select class="custom-select" id="connection" name="connection">
                                 <option value="">-- Please select --</option>
                                 <option value="GPRS">GPRS</option>
                                 <option value="LAN">LAN</option>
@@ -134,7 +134,7 @@
                     <label for="sim card">Sim Card</label>
                     <div class="form-group">
                         <div class="form-line">
-                            <select class="form-control show-tick" id="simcard" name="SIMCard">
+                            <select class="custom-select" id="simcard" name="simcard">
                                 <option value="">-- Please select --</option>
                                 <option value="LAN">LAN</option>
                                 <option value="Telkomsel">Telkomsel</option>
@@ -151,7 +151,7 @@
                     <label for="typeedc">Type EDC</label>
                     <div class="form-group">
                         <div class="form-line">
-                            <select class="form-control show-tick" id="typeedc" name="TypeEDC">
+                            <select class="custom-select" id="typeedc" name="type">
                                 <option value="">-- Please select --</option>
                                 <option value="WireCard">WireCard</option>
                                 <option value="BCA">BCA</option>
@@ -167,7 +167,7 @@
                     <label for="type">Status EDC</label>
                     <div class="form-group">
                         <div class="form-line">
-                            <select class="form-control show-tick" id="statusedc" name="Status">
+                            <select class="custom-select" id="statusedc" name="status">
                                 <option value="">-- Please select --</option>
                                 <option value="Active">Active</option>
                                 <option value="Inactive">Inactive</option>
@@ -211,16 +211,16 @@
         // `d` is the original data object for the row
         return '<table cellpadding="5" cellspacing="0" border="0" style="padding-left:50px;">'+
             '<tr>'+
-                '<td>Full name:</td>'+
-                '<td>'+d.TypeEDC+'</td>'+
+                '<td>MID :</td>'+
+                '<td>'+d.midedc+'</td>'+
             '</tr>'+
             '<tr>'+
-                '<td>Extension number:</td>'+
-                '<td>'+d.Connection+'</td>'+
+                '<td>Sim Card :</td>'+
+                '<td>'+d.simcard+'</td>'+
             '</tr>'+
             '<tr>'+
-                '<td>Extra info:</td>'+
-                '<td>And any further details here (images etc)...</td>'+
+                '<td>IP Address:</td>'+
+                '<td>'+d.ipaddress+'</td>'+
             '</tr>'+
         '</table>';
     }
@@ -250,8 +250,8 @@
                 { data: 'tidedc', name: 'tidedc' },
                 { data: 'counter.nocounter', name: 'counter.nocounter' },
                 { data: 'connection', name: 'connection' },
-                { data: 'simcard', name: 'simcard' },
                 { data: 'type', name: 'type' },
+                { data: 'status', name: 'status' },
                 { data: 'action', name: 'action', orderable: false,searchable: false}
             ],
             order: [[ 2, "asc" ]],
@@ -315,13 +315,14 @@
                 $('#savebutton').html('Save Changes');
                 $('#ajaxModel').modal('show');
                 $('#edcid').val(data.id);
-                $('#tidedc').val(data.TIDEDC);
-                $('#midedc').val(data.MIDEDC);
-                $('#ipedc').val(data.IPAdress);
-                $('#nocounter').val(data.NoCounter);
-                $('#connection').val(data.Connection);
-                $('#simcard').val(data.SIMCard);
-                $('#typeedc').val(data.TypeEDC);
+                $('#tidedc').val(data.tidedc);
+                $('#midedc').val(data.midedc);
+                $('#ipedc').val(data.ipaddress);
+                $('#nocounter').val(data.nocounter);
+                $('#connection').val(data.connection);
+                $('#simcard').val(data.simcard);
+                $('#typeedc').val(data.type);
+                $('#statusedc').val(data.status);
             })
         });
 

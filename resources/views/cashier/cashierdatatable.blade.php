@@ -121,7 +121,7 @@
                                 <label for="position">Position</label>
                                 <div class="form-group">
                                     <div class="form-line">
-                                        <select class="form-control show-tick" id="position" name="position">
+                                        <select class="custom-select" id="position" name="position">
                                             <option value="">-- Please select --</option>
                                             <option value="Cashier">Cashier</option>
                                             <option value="Customer Service">Customer Service</option>
@@ -147,7 +147,7 @@
                                     <label for="position">Status</label>
                                     <div class="form-group">
                                         <div class="form-line">
-                                            <select class="form-control show-tick" id="statuscashier"
+                                            <select class="custom-select" id="statuscashier"
                                                 name="statuscashier">
                                                 <option value="">-- Please select --</option>
                                                 <option value="Active">Active</option>
