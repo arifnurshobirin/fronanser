@@ -64,8 +64,8 @@ class ScheduleController extends Controller
             </div></div>')
             ->rawColumns(['StatusCashier','EmployeeName','action'])
             ->editColumn('cashier.status', function ($Schedule) {
-                if ($Schedule->cashier['status'] == 'Active') return '<span class="badge badge-primary">' .$Schedule->cashier['status'].'</span>';
-                if ($Schedule->cashier['status'] == 'Inactive') return '<span class="badge badge-danger">' .$Schedule->cashier['status'].'</span>';
+                if ($Schedule->cashier['status'] == 'Active') return '<span class="badge badge-success">' .$Schedule->cashier['status'].'</span>';
+                if ($Schedule->cashier['status'] == 'Inactive') return '<span class="badge badge-warning">' .$Schedule->cashier['status'].'</span>';
                 return 'Null';
             })
             ->escapeColumns('cashier.status')
@@ -90,7 +90,14 @@ class ScheduleController extends Controller
     {
          // $dataschedule = Schedule::latest()->get();;where('position',$positiontable)->
         $positiontable = $request->position;
-        $datacashier = Cashier::whereIn('position',$positiontable)->where('status','Active')->get();
+        $datacashier = Cashier::whereIn('position',$positiontable)->where('status','Active')->orderBy('employee','ASC')->get();
+        return response()->json($datacashier);
+    }
+
+    public function form($id)
+    {
+         // $dataschedule = Schedule::latest()->get();;where('position',$positiontable)->
+        $datacashier = Cashier::find($id);
         return response()->json($datacashier);
     }
 

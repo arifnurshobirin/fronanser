@@ -37,7 +37,7 @@
         </div>
         <!-- /.card-header -->
         <div class="card-body">
-            <!-- Date range -->
+            <!-- Filter -->
             <form method="post" id="scheduleform" name="scheduleform">
                 @csrf
                 <div class="form-group">
@@ -45,7 +45,7 @@
                     <div class="row">
                         <div class="col-md-3">
                             <input type="text" class="form-control" id="dateinput" name="dateinput" placeholder="Select a date" required>
-                            <input type="text" class="form-control" id="weekinput" name="weekinput" placeholder="Week Number">
+                            <input type="text" class="form-control" id="weekinput" name="weekinput" placeholder="Week Number" readonly>
                         </div>
                         <div class="col-md-3">
                             {{-- <input type="text" class="form-control" id="position" name="position"> --}}
@@ -77,163 +77,150 @@
                     </div>
                 </div>
             </form>
-            <!-- /.form group -->
-            <div class="table-responsive">
-                <table class="table table-bordered table-striped table-hover dataTable js-exportable"
-                    id="ScheduleDatatable" style="width:100%">
-                    <thead class="bg-danger">
-                        <tr>
-                            <th>Employee Name</th>
-                            <th>Position</th>
-                            <th>Week Number</th>
-                            <th>Status</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id="bodytable">
-                    </tbody>
-                    <tfoot class="bg-danger">
-                        <tr>
-                            <th>Employee Name</th>
-                            <th>Position</th>
-                            <th>Week Number</th>
-                            <th>Status</th>
-                            <th>Action</th>
-                        </tr>
-                    </tfoot>
-                </table>
-            </div>
-
-            <!-- Create Table -->
-            <div class="modal fade" id="schedulemodal" data-backdrop="static" aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h4 class="modal-title" id="modelHeading">Create Schedule</h4>
-                            <button type="button" class="btn btn-secondary" id="resetmodal" data-dismiss="modal"><i class='fas fa-times'></i> Close</button>
-                        </div>
-                        <div class="modal-body" id="schedulemodalbody">
-                            <!-- Profile Image -->
-                            <div class="card card-danger card-outline">
-                                <div class="card-body box-profile">
-                                    <div class="text-center">
-                                        <img class="profile-user-img img-fluid img-circle" id="avatarschedule" src="{{ asset('dashboard/img/avatar.png') }}" alt="User">
-                                    </div>
-                                    <h3 class="profile-username text-center" id="fullnameschedule">Null</h3>
-                                    <p class="text-muted text-center" id="positionschedule">Null</p>
-                                    <form method="post" id="scheduleformcreate" name="scheduleformcreate">
-                                        @csrf
-                                    <div class="form-group row">
-                                        <select class="custom-select col-sm-3" id="selectshift" name="selectshift">
-                                            {{-- @foreach($dataworkinghour as $list)
-                                            <option value="{{$list->id}}">Week {{$list->id}}</option>
-                                            @endforeach --}}
-                                        </select>
-                                        <label class="col-form-label col-sm-3" id="labeltotalwh" name="labeltotalwh">0 Hour</label>
-                                        <button type="submit" class="btn btn-primary col-sm-3" id="schedulesave" value="create">Save</button>
-                                    </div>
-                                    <input type="hidden" name="scheduleid" id="scheduleid">
-                                    <div class="form-group row">
-                                        <label for="labeldate" class="col-sm-3 col-form-label">Senin :</label>
-                                        <div class="form-line col-sm-2">
-                                            <input type="text" class="form-control input-uppercase" id="codeshift1" name="codeshift1" oninput="datashift(1)">
-                                        </div>
-                                        <div class="form-line col-sm-5">
-                                        <input type="text" class="form-control" id="inputshift1" name="inputshift1" readonly>
-                                        </div>
-                                        <div class="form-line col-sm-2">
-                                            <label class="col-form-label" id="labelhour1" name="labelhour">0</label>
-                                            Hour
-                                        </div>
-                                    </div>
-                                    <div class="form-group row">
-                                        <label for="labeldate" class="col-sm-3 col-form-label">Selasa :</label>
-                                        <div class="form-line col-sm-2">
-                                            <input type="text" class="form-control input-uppercase" id="codeshift2" name="codeshift2" oninput="datashift(2)">
-                                        </div>
-                                        <div class="form-line col-sm-5">
-                                        <input type="text" class="form-control" id="inputshift2" name="inputshif2t" readonly>
-                                        </div>
-                                        <div class="form-line col-sm-2">
-                                            <label class="col-form-label" id="labelhour2" name="labelhour">0</label>
-                                            Hour
-                                        </div>
-                                    </div>
-                                    <div class="form-group row">
-                                        <label for="labeldate" class="col-sm-3 col-form-label">Rabu :</label>
-                                        <div class="form-line col-sm-2">
-                                            <input type="text" class="form-control input-uppercase" id="codeshift3" name="codeshift3" oninput="datashift(3)">
-                                        </div>
-                                        <div class="form-line col-sm-5">
-                                        <input type="text" class="form-control" id="inputshift3" name="inputshift3" readonly>
-                                        </div>
-                                        <div class="form-line col-sm-2">
-                                            <label class="col-form-label" id="labelhour3" name="labelhour">0</label>
-                                            Hour
-                                        </div>
-                                    </div>
-                                    <div class="form-group row">
-                                        <label for="labeldate" class="col-sm-3 col-form-label">Kamis :</label>
-                                        <div class="form-line col-sm-2">
-                                            <input type="text" class="form-control input-uppercase" id="codeshift4" name="codeshift4" oninput="datashift(4)">
-                                        </div>
-                                        <div class="form-line col-sm-5">
-                                        <input type="text" class="form-control" id="inputshift4" name="inputshift4" readonly>
-                                        </div>
-                                        <div class="form-line col-sm-2">
-                                            <label class="col-form-label" id="labelhour4" name="labelhour">0</label>
-                                            Hour
-                                        </div>
-                                    </div>
-                                    <div class="form-group row">
-                                        <label for="labeldate" class="col-sm-3 col-form-label">Jumat :</label>
-                                        <div class="form-line col-sm-2">
-                                            <input type="text" class="form-control input-uppercase" id="codeshift5" name="codeshift5" oninput="datashift(5)">
-                                        </div>
-                                        <div class="form-line col-sm-5">
-                                        <input type="text" class="form-control" id="inputshift5" name="inputshift5" readonly>
-                                        </div>
-                                        <div class="form-line col-sm-2">
-                                            <label class="col-form-label" id="labelhour5" name="labelhour">0</label>
-                                            Hour
-                                        </div>
-                                    </div>
-                                    <div class="form-group row">
-                                        <label for="labeldate" class="col-sm-3 col-form-label">Sabtu :</label>
-                                        <div class="form-line col-sm-2">
-                                            <input type="text" class="form-control input-uppercase" id="codeshift6" name="codeshift6" oninput="datashift(6)">
-                                        </div>
-                                        <div class="form-line col-sm-5">
-                                        <input type="text" class="form-control" id="inputshift6" name="inputshift6" readonly>
-                                        </div>
-                                        <div class="form-line col-sm-2">
-                                            <label class="col-form-label" id="labelhour6" name="labelhour">0</label>
-                                            Hour
-                                        </div>
-                                    </div>
-                                    <div class="form-group row">
-                                        <label for="labeldate" class="col-sm-3 col-form-label">Minggu :</label>
-                                        <div class="form-line col-sm-2">
-                                            <input type="text" class="form-control input-uppercase" id="codeshift7" name="codeshift7" oninput="datashift(7)">
-                                        </div>
-                                        <div class="form-line col-sm-5">
-                                        <input type="text" class="form-control" id="inputshift7" name="inputshift7" readonly>
-                                        </div>
-                                        <div class="form-line col-sm-2">
-                                            <label class="col-form-label" id="labelhour7" name="labelhour">0</label>
-                                            Hour
-                                        </div>
-                                    </div>
-                                    </form>
-                                </div>
-                                <!-- /.card-body -->
-                            </div>
-                            <!-- /.card -->
-                        </div>
+            <!-- /.filter schedule -->
+            <div class="row">
+                <div class="col-md-7">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped table-hover dataTable js-exportable"
+                            id="ScheduleDatatable" style="width:100%">
+                            <thead class="bg-danger">
+                                <tr>
+                                    <th>Employee Name</th>
+                                    <th>Position</th>
+                                    <th>Week</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="bodytable">
+                            </tbody>
+                            <tfoot class="bg-danger">
+                                <tr>
+                                    <th>Employee Name</th>
+                                    <th>Position</th>
+                                    <th>Week</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </tfoot>
+                        </table>
                     </div>
                 </div>
+                <div class="col-md-5">
+                    <!-- Profile Image -->
+                    <div class="card card-danger card-outline">
+                        <div class="card-body box-profile">
+                            <div class="text-center">
+                                <img class="profile-user-img img-fluid img-circle" id="avatarschedule" src="{{ asset('dashboard/img/avatar.png') }}" alt="User">
+                            </div>
+                            <h3 class="profile-username text-center" id="fullnameschedule">Null</h3>
+                            <p class="text-muted text-center" id="positionschedule">Null</p>
+                            <form method="post" id="scheduleformcreate" name="scheduleformcreate">
+                                @csrf
+                            <div class="form-group row">
+                                <label for="labeldate" id="labelweeknumber" name="labelweeknumber" class="col-sm-3 col-form-label">Week </label>
+                                <button type="submit" class="btn btn-primary col-sm-7" id="schedulesave" value="create">Save</button>
+                                <label class="col-form-label col-sm-2" id="labeltotalwh" name="labeltotalwh">0 Hour</label>
+                            </div>
+                            <input type="hidden" name="scheduleid" id="scheduleid">
+                            <div class="form-group row">
+                                <label for="labeldate" id="day1" class="col-sm-3 col-form-label">Day 1 :</label>
+                                <div class="form-line col-sm-2">
+                                    <input type="text" class="form-control input-uppercase" id="codeshift1" name="codeshift1" oninput="datashift(1)">
+                                </div>
+                                <div class="form-line col-sm-5">
+                                <input type="text" class="form-control" id="inputshift1" name="inputshift1" readonly>
+                                </div>
+                                <div class="form-line col-sm-2">
+                                    <label class="col-form-label" id="labelhour1" name="labelhour">0</label>
+                                    Hour
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="labeldate"  id="day2" class="col-sm-3 col-form-label">Day 2 :</label>
+                                <div class="form-line col-sm-2">
+                                    <input type="text" class="form-control input-uppercase" id="codeshift2" name="codeshift2" oninput="datashift(2)">
+                                </div>
+                                <div class="form-line col-sm-5">
+                                <input type="text" class="form-control" id="inputshift2" name="inputshif2t" readonly>
+                                </div>
+                                <div class="form-line col-sm-2">
+                                    <label class="col-form-label" id="labelhour2" name="labelhour">0</label>
+                                    Hour
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="labeldate"  id="day3" class="col-sm-3 col-form-label">Day 3 :</label>
+                                <div class="form-line col-sm-2">
+                                    <input type="text" class="form-control input-uppercase" id="codeshift3" name="codeshift3" oninput="datashift(3)">
+                                </div>
+                                <div class="form-line col-sm-5">
+                                <input type="text" class="form-control" id="inputshift3" name="inputshift3" readonly>
+                                </div>
+                                <div class="form-line col-sm-2">
+                                    <label class="col-form-label" id="labelhour3" name="labelhour">0</label>
+                                    Hour
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="labeldate"  id="day4" class="col-sm-3 col-form-label">Day 4 :</label>
+                                <div class="form-line col-sm-2">
+                                    <input type="text" class="form-control input-uppercase" id="codeshift4" name="codeshift4" oninput="datashift(4)">
+                                </div>
+                                <div class="form-line col-sm-5">
+                                <input type="text" class="form-control" id="inputshift4" name="inputshift4" readonly>
+                                </div>
+                                <div class="form-line col-sm-2">
+                                    <label class="col-form-label" id="labelhour4" name="labelhour">0</label>
+                                    Hour
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="labeldate"  id="day5" class="col-sm-3 col-form-label">Day 5 :</label>
+                                <div class="form-line col-sm-2">
+                                    <input type="text" class="form-control input-uppercase" id="codeshift5" name="codeshift5" oninput="datashift(5)">
+                                </div>
+                                <div class="form-line col-sm-5">
+                                <input type="text" class="form-control" id="inputshift5" name="inputshift5" readonly>
+                                </div>
+                                <div class="form-line col-sm-2">
+                                    <label class="col-form-label" id="labelhour5" name="labelhour">0</label>
+                                    Hour
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="labeldate"  id="day6" class="col-sm-3 col-form-label">Day 6 :</label>
+                                <div class="form-line col-sm-2">
+                                    <input type="text" class="form-control input-uppercase" id="codeshift6" name="codeshift6" oninput="datashift(6)">
+                                </div>
+                                <div class="form-line col-sm-5">
+                                <input type="text" class="form-control" id="inputshift6" name="inputshift6" readonly>
+                                </div>
+                                <div class="form-line col-sm-2">
+                                    <label class="col-form-label" id="labelhour6" name="labelhour">0</label>
+                                    Hour
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="labeldate"   id="day7" class="col-sm-3 col-form-label">Day 7 :</label>
+                                <div class="form-line col-sm-2">
+                                    <input type="text" class="form-control input-uppercase" id="codeshift7" name="codeshift7" oninput="datashift(7)">
+                                </div>
+                                <div class="form-line col-sm-5">
+                                <input type="text" class="form-control" id="inputshift7" name="inputshift7" readonly>
+                                </div>
+                                <div class="form-line col-sm-2">
+                                    <label class="col-form-label" id="labelhour7" name="labelhour">0</label>
+                                    Hour
+                                </div>
+                            </div>
+                            </form>
+                        </div>
+                        <!-- /.card-body -->
+                    </div>
+                    <!-- /.card -->
+                </div>
             </div>
-            <!-- #END# Create Table -->
 
             <!-- modal codeshift -->
             <div class="modal fade" id="codeshiftmodal" data-backdrop="static" aria-hidden="true">
@@ -322,15 +309,12 @@ function datashift(day){
 
     for(b=0;b<size;b++)
     {
-        if(shift==datajs[b]['CodeShift']){
-            timework = datajs[b]['WorkingHour'];
-            shiftstart = datajs[b]['StartShift'];
-            shiftend = datajs[b]['EndShift'];
+        if(shift==datajs[b]['codeshift']){
+            timework = datajs[b]['workinghour'];
+            shiftstart = datajs[b]['startshift'];
+            shiftend = datajs[b]['endshift'];
             shift=shiftstart.concat(' - ',shiftend);
             break;
-        }
-        else if(shift=="OFF"){
-            shift="OFF Work";
         }
         else if(shift=="AL"){
             shift="Cuti";
@@ -425,6 +409,7 @@ function datashift(day){
         });
 
         $(document).on('click', '.createschedule', function () {
+            $('#bodytable').html("");
             var position = $('#positionselect').val();
             $.ajax({
                 url: "{{ route('schedule.create') }}",
@@ -436,14 +421,17 @@ function datashift(day){
 
                     var objectcashier= data;
                     var linkimage="{{ asset('dashboard/img/')}}";
+                    var week = $('#weekinput').val();
 
                     objectcashier.forEach(function(datatablecashier, data){
                         $('#bodytable').append("<tr>"+
-                                                "<td>"+datatablecashier.fullname+"</td>"+
-                                                "<td>"+datatablecashier.idcard+"</td>"+
-                                                "<td>"+datatablecashier.joindate+"</td>"+
+                                                "<td>"+datatablecashier.employee+" - "+datatablecashier.fullname+"</td>"+
                                                 "<td>"+datatablecashier.position+"</td>"+
-                                                "<td>"+datatablecashier.status+"</td> </tr>");
+                                                "<td id='weeknumber'>"+week+"</td>"+
+                                                "<td><span class='badge badge-success'>"+datatablecashier.status+"</span></td>"+
+                                                "<td><button class='createform btn btn-warning' id="+datatablecashier.id+"><i class='fas fa-edit'></i></button>"+
+                                                "    <button class='deleteform btn btn-danger' id="+datatablecashier.id+"><i class='fas fa-trash'></i></button>"+
+                                                "</td></tr>");
                     })
                 },
                 error: function (data) {
@@ -468,14 +456,61 @@ function datashift(day){
             })
         });
 
-        $(document).on('click', '.schedulecreate', function () {
-            var id = $(this).attr('id');
-            $('#schedulesave').val("create-schedule");
-            $('#schedulesave').html('Save');
-            $('#scheduleid').val('');
-            $('#scheduleform').trigger("reset");
-            $('#modelHeading').html("Create New Schedule");
-            $('#schedulemodal').modal('show');
+        $(document).on('click', '.createform', function () {
+            var cashierid = $(this).attr('id');
+            var weeknumber = $('#weekinput').val();
+            var startdate = $('#dateinput').val();
+            var day;
+
+            for( i=1;i<=7;i++)
+            {
+                if(i==1){
+                    day = new Date(startdate);
+                }
+                else{
+                    day = new Date(day);
+                    day.setDate(day.getDate()+1);
+                }
+                formatday = moment(day).format('dd DD-MM-YYYY');
+                $('#day'+i).html(formatday);
+            }
+
+            $.get("{{ route('schedule.index') }}" +'/' + cashierid +'/create', function (datacashier)
+            {
+                $('#modelHeading').html("Edit Data Schedule");
+                $('#scheduleid').val(datacashier.id);
+                $('#labelweeknumber').html("Week "+weeknumber);
+                $('#avatarschedule').attr('src','../../dashboard/img/'+datacashier.avatar);
+                $('#fullnameschedule').html(datacashier.fullname);
+                $('#positionschedule').html(datacashier.position);
+            })
+        });
+
+
+        $(document).on('click', '.deleteform', function () {
+            var cashierid = $(this).attr('id');
+            swal.fire({
+                title: "Are you sure?",
+                text: "You will change the employee status to Inactive!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes, delete!",
+                cancelButtonText: "No, cancel!"
+            }).then((result) => {
+                if (result.value) {
+                    $.ajax({
+                url:"cashier/"+cashierid,
+                type: "PATCH",
+                success:function(data){
+                    swal.fire("Deleted!", "Your employee status has been Inactive.", "success")
+                }
+                });
+                } else {
+                    swal.fire("Cancelled", "Your employee status  is Active :)", "error");
+                }
+            });
+
         });
 
 
@@ -502,48 +537,6 @@ function datashift(day){
             });
         });
 
-            var type;
-            var schedule_id;
-            $(document).on('click', '.js-sweetalert', function(){
-            schedule_id = $(this).attr('id');
-            var type = $(this).data('type');
-            if (type === 'basic') {
-                showBasicMessage();
-            }
-            else if (type === 'cancel') {
-                showCancelMessage();
-            }
-        });
-
-
-        function showCancelMessage() {
-            swal({
-                title: "Are you sure?",
-                text: "You will not be able to recover this edc file!",
-                type: "warning",
-                showCancelButton: true,
-                confirmButtonColor: "#DD6B55",
-                confirmButtonText: "Yes, delete!",
-                cancelButtonText: "No, cancel!",
-                closeOnConfirm: false,
-                closeOnCancel: false,
-                showLoaderOnConfirm: true
-            }, function (isConfirm) {
-                if (isConfirm) {
-                    $.ajax({
-                url:"schedule/"+schedule_id,
-                type: "DELETE",
-                success:function(data){
-                    swal("Deleted!", "Your Schedule file has been deleted.", "success")
-                    $('#ScheduleDatatable').DataTable().ajax.reload();
-                }
-                });
-                } else {
-                    swal("Cancelled", "Your Schedule file is safe :)", "error");
-                }
-            });
-        }
-
         //Date range picker
         $('#dateinput').datepicker({
             onSelect: function (dateText, inst) {
@@ -555,13 +548,6 @@ function datashift(day){
             selectOtherMonths: true
         });
 
-
-        //Date range picker
-        // $('#datefilter').daterangepicker({
-        //     "showWeekNumbers": true,
-        //     "showISOWeekNumbers": true
-        // })
-
         //Initialize Select2 Elements
         $('.select2').select2()
 
@@ -571,12 +557,6 @@ function datashift(day){
         .search( $(this).val() )
         .draw();
         });
-
-        // $('.filter-datatable').change(function () {
-        // table.column( $(this).data('column'))
-        // .search( $(this).val() )
-        // .draw();
-        // });
 
     });
 </script>
