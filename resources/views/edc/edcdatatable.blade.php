@@ -42,22 +42,10 @@
                                 <th>Action</th>
                             </tr>
                         </thead>
-                        <tfoot class="bg-danger">
-                            <tr>
-                                <th></th>
-                                <th></th>
-                                <th>TID</th>
-                                <th>No Counter</th>
-                                <th>Connection</th>
-                                <th>Type</th>
-                                <th>Status</th>
-                                <th>Action</th>
-                            </tr>
-                        </tfoot>
                     </table>
                 </div>
 <!-- Create Table -->
-<div class="modal fade" id="ajaxModel" data-backdrop="static"  aria-hidden="true">
+<div class="modal fade" id="edcmodal" data-backdrop="static"  aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -65,7 +53,8 @@
                 <button type="button" class="btn btn-danger" id="resetmodal" data-dismiss="modal"><i class='fas fa-times'></i> Close</button>
             </div>
             <div class="modal-body">
-                <form method="post" id="edcForm" name="edcForm" action="{{ route('edc.store') }}">
+                <form method="post" id="edcForm" name="edcForm">
+                    {{-- action="/admin/edc/store" --}}
                     @csrf
                     <input type="hidden" name="id" id="edcid">
                     <label for="tid">TID EDC</label>
@@ -73,33 +62,26 @@
                         <div class="form-line">
                             <input type="text" id="tidedc" name="tidedc" class="form-control" placeholder="Enter your TID EDC">
                         </div>
-                        @error('TIDEDC')
+                        <div id="errortidedc"></div>
+                        {{-- @error('tidedc')
                             <div class="text-danger mt-2">
                             {{ $message }}
                             </div>
-                        @enderror
+                        @enderror --}}
                     </div>
                     <label for="mid">MID EDC</label>
                     <div class="form-group">
                         <div class="form-line">
                             <input type="text" id="midedc" name="midedc" class="form-control" placeholder="Enter your MID EDC">
                         </div>
-                        @error('MIDEDC')
-                            <div class="text-danger mt-2">
-                            {{ $message }}
-                            </div>
-                        @enderror
+                        <div id="errormidedc"></div>
                     </div>
-                    <label for="ipaddress">IP Adress</label>
+                    <label for="ipaddress">IP Address</label>
                     <div class="form-group">
                         <div class="form-line">
-                            <input type="text" id="ipedc" name="ipadress" class="form-control" placeholder="Enter your IP Adress">
+                            <input type="text" id="ipaddress" name="ipaddress" class="form-control" placeholder="Enter your IP Adress">
                         </div>
-                        @error('IPAdress')
-                        <div class="text-danger mt-2">
-                        {{ $message }}
-                        </div>
-                    @enderror
+                        <div id="erroripaddress"></div>
                     </div>
                     <label for="no">No Counter</label>
                     <div class="form-group">
@@ -110,11 +92,7 @@
                                 @endforeach
                             </select>
                         </div>
-                        @error('counter_id')
-                        <div class="text-danger mt-2">
-                        {{ $message }}
-                        </div>
-                    @enderror
+                        <div id="errorcounter_id"></div>
                     </div>
                     <label for="connection">Connection</label>
                     <div class="form-group">
@@ -125,11 +103,7 @@
                                 <option value="LAN">LAN</option>
                             </select>
                         </div>
-                        @error('Connection')
-                        <div class="text-danger mt-2">
-                        {{ $message }}
-                        </div>
-                        @enderror
+                        <div id="errorconnection"></div>
                     </div>
                     <label for="sim card">Sim Card</label>
                     <div class="form-group">
@@ -142,11 +116,7 @@
                                 <option value="XL">XL</option>
                             </select>
                         </div>
-                        @error('SIMCard')
-                        <div class="text-danger mt-2">
-                        {{ $message }}
-                        </div>
-                    @enderror
+                        <div id="errorsimcard"></div>
                     </div>
                     <label for="typeedc">Type EDC</label>
                     <div class="form-group">
@@ -158,11 +128,7 @@
                                 <option value="Spots">Spots</option>
                             </select>
                         </div>
-                        @error('TypeEDC')
-                        <div class="text-danger mt-2">
-                        {{ $message }}
-                        </div>
-                        @enderror
+                        <div id="errortype"></div>
                     </div>
                     <label for="type">Status EDC</label>
                     <div class="form-group">
@@ -175,13 +141,9 @@
                                 <option value="Broken">Broken</option>
                             </select>
                         </div>
-                        @error('Status')
-                        <div class="text-danger mt-2">
-                        {{ $message }}
-                        </div>
-                        @enderror
+                        <div id="errorstatus"></div>
                     </div>
-                    <button type="submit" class="btn btn-primary m-t-15" id="buttonsave" value="create">Save</button>
+                    <button type="button" class="btn btn-primary m-t-15" id="savebutton" value="create">Save</button>
                 </form>
             </div>
         </div>
@@ -204,6 +166,11 @@
 @endsection
 
 @push('scripts')
+@error('status')
+<script>
+    $('#edcmodal').modal('show');
+</script>
+@enderror
 <script>
     $(".preloader").fadeOut("slow");
 
@@ -230,6 +197,8 @@
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 }
             });
+
+        var arrayerror = ['tidedc','midedc','ipaddress','counter_id','connection','simcard','type','status'];
 
         var table = $('#EDCDatatable').DataTable({
             processing: true,
@@ -261,29 +230,31 @@
             [ '10 rows', '25 rows', '50 rows', 'Show all' ]
         ],
         buttons:['pageLength',
-
+                    {
+                        collectionTitle: 'Visibility control',
+                        extend: 'colvis',
+                        collectionLayout: 'two-column'
+                    },
                     {
                         extend: 'collection',
                         text: 'Export',
-                        className: 'btn btn-info',
-                        buttons:[ 'copy', 'csv', 'excel', 'pdf', 'print',
-                                    {
-                                        collectionTitle: 'Visibility control',
-                                        extend: 'colvis',
-                                        collectionLayout: 'two-column'
-                                    }
-                                ]
+                        className: 'btn btn-secondary',
+                        buttons:[ 'copy', 'csv', 'excel', 'pdf', 'print']
                     },
                     {
                         text: '<i class="fas fa-plus"></i><span> Add EDC</span>',
-                        className: 'btn btn-success',
+                        className: 'btn btn-secondary',
                         action: function ( e, dt, node, config ) {
+                            for( a=0;a<8;a++)
+                            {
+                                $('#error'+arrayerror[a]).html('');
+                            }
                             $('#savebutton').val("create-edc");
                             $('#savebutton').html('Save');
                             $('#edcid').val('');
                             $('#edcForm').trigger("reset");
                             $('#modelHeading').html("Create New EDC");
-                            $('#ajaxModel').modal('show');
+                            $('#edcmodal').modal('show');
                         }
                     }
                 ]
@@ -310,15 +281,18 @@
             var edcid = $(this).attr('id');
             $.get("{{ route('edc.index') }}" +'/' + edcid +'/edit', function (data)
             {
+                for( a=0;a<8;a++)
+                    {
+                        $('#error'+arrayerror[a]).html('');
+                    }
                 $('#modelHeading').html("Edit Data EDC");
-                $('#savebutton').val("edit-edc");
                 $('#savebutton').html('Save Changes');
-                $('#ajaxModel').modal('show');
+                $('#edcmodal').modal('show');
                 $('#edcid').val(data.id);
                 $('#tidedc').val(data.tidedc);
                 $('#midedc').val(data.midedc);
-                $('#ipedc').val(data.ipaddress);
-                $('#nocounter').val(data.nocounter);
+                $('#ipaddress').val(data.ipaddress);
+                $('#selectnocounter').val(data.nocounter);
                 $('#connection').val(data.connection);
                 $('#simcard').val(data.simcard);
                 $('#typeedc').val(data.type);
@@ -331,28 +305,35 @@
                 $('#contentpage').load('edc'+'/'+id);
         });
 
-        // $('#savebutton').click(function (e) {
-        //     e.preventDefault();
-        //     $(this).html('Sending..');
-        //     $.ajax({
-        //         data: $('#edcForm').serialize(),
-        //         url: "{{ route('edc.store') }}",
-        //         type: "POST",
-        //         dataType: 'json',
-        //         success: function (data) {
+        $('#savebutton').click(function (e) {
+            e.preventDefault();
+            $(this).html('Sending..');
+            $.ajax({
+                data: $('#edcForm').serialize(),
+                url: "{{ route('edc.store') }}",
+                type: "POST",
+                dataType: 'json',
+                success: function (data) {
 
-        //             $('#edcForm').trigger("reset");
-        //             $('#ajaxModel').modal('hide');
-        //             $('#savebutton').html('Save');
-        //             table.draw();
-        //             swal.fire("Good job!", "You success update EDC!", "success");
-        //         },
-        //         error: function (data) {
-        //             console.log('Error:', data);
-        //             $('#savebutton').html('Save Changes');
-        //         }
-        //     });
-        // });
+                    $('#edcForm').trigger("reset");
+                    $('#edcmodal').modal('hide');
+                    $('#savebutton').html('Save');
+                    table.draw();
+                    swal.fire("Good job!", "You success update EDC!", "success");
+                },
+                error: function (data) {
+                    console.log('Error:', data);
+                    $('#savebutton').html('Save Changes');
+                    for( a=0;a<8;a++)
+                    {
+                        $('#error'+arrayerror[a]).html('');
+                    }
+                    $.each(data.responseJSON.errors, function(key,value) {
+                        $('#error'+key).append('<div class="text-danger mt-2">'+value+'</div');
+                    });
+                }
+            });
+        });
 
         var type;
         var edcid;

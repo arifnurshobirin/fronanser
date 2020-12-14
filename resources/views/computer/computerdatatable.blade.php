@@ -40,17 +40,6 @@
                             <th>Action</th>
                         </tr>
                     </thead>
-                    <tfoot class="bg-danger">
-                        <tr>
-                            <th></th>
-                            <th></th>
-                            <th>No Computer</th>
-                            <th>No Counter</th>
-                            <th>Type</th>
-                            <th>Status</th>
-                            <th>Action</th>
-                        </tr>
-                    </tfoot>
                 </table>
             </div>
 
@@ -70,13 +59,25 @@
                                 <div class="form-group">
                                     <div class="form-line">
                                         <input type="text" id="nocomputer" name="nocomputer" class="form-control"
-                                            placeholder="Enter your No Computer" required>
+                                            placeholder="Enter your No Computer">
                                     </div>
+                                    <div id="errornocomputer"></div>
                                 </div>
-                                <label for="cpu">CPU Computer</label>
+                                <label for="no">No Counter</label>
                                 <div class="form-group">
                                     <div class="form-line">
-                                        <select class="custom-select" id="cpu" name="cpu">
+                                        <select class="custom-select" id="selectnocounter" name="counter_id">
+                                            @foreach($datacounter as $counter)
+                                            <option value="{{$counter->id}}">{{$counter->nocounter}}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div id="errorcounter_id"></div>
+                                </div>
+                                <label for="cpu">Type Computer</label>
+                                <div class="form-group">
+                                    <div class="form-line">
+                                        <select class="custom-select" id="type" name="type">
                                             <option value="">-- Please select --</option>
                                             <option value="Zonerich">Zonerich</option>
                                             <option value="IBM">IBM</option>
@@ -85,6 +86,7 @@
                                             <option value="Wincore M3">Wincore M3</option>
                                         </select>
                                     </div>
+                                    <div id="errortype"></div>
                                 </div>
 
                                 <label for="printer">Printer</label>
@@ -100,6 +102,7 @@
                                             <option value="HP">HP</option>
                                         </select>
                                     </div>
+                                    <div id="errorprinter"></div>
                                 </div>
 
                                 <label for="scanner">Scanner</label>
@@ -114,6 +117,7 @@
                                             <option value="HP">HP</option>
                                         </select>
                                     </div>
+                                    <div id="errorscanner"></div>
                                 </div>
 
                                 <label for="drawer">Drawer</label>
@@ -126,8 +130,8 @@
                                             <option value="HP">HP</option>
                                         </select>
                                     </div>
+                                    <div id="errordrawer"></div>
                                 </div>
-
                                 <label for="monitor">Monitor</label>
                                 <div class="form-group">
                                     <div class="form-line">
@@ -138,6 +142,20 @@
                                             <option value="Wincore">Wincore</option>
                                         </select>
                                     </div>
+                                    <div id="errormonitor"></div>
+                                </div>
+                                <label for="type">Status Computer</label>
+                                <div class="form-group">
+                                    <div class="form-line">
+                                        <select class="custom-select" id="status" name="status">
+                                            <option value="">-- Please select --</option>
+                                            <option value="Active">Active</option>
+                                            <option value="Inactive">Inactive</option>
+                                            <option value="Lock">Lock</option>
+                                            <option value="Broken">Broken</option>
+                                        </select>
+                                    </div>
+                                    <div id="errorstatus"></div>
                                 </div>
                                 <button type="submit" class="btn btn-primary m-t-15 waves-effect" id="computersave"
                                     value="create">Save</button>
@@ -160,6 +178,14 @@
 
 @section('javascript')
 <!-- page script -->
+@endsection
+
+@push('scripts')
+@error('status')
+<script>
+    $('#computermodal').modal('show');
+</script>
+@enderror
 <script>
     $(".preloader").fadeOut("slow");
     function format ( d ) {
@@ -190,6 +216,8 @@
                 }
             });
 
+        var arrayerror = ['nocomputer','printer','drawer','counter_id','scanner','monitor','type','status'];
+
         // var template = Handlebars.compile($("#details-template").html());
         var table = $('#ComputerDatatable').DataTable({
         processing: true,
@@ -217,23 +245,25 @@
             [ '10 rows', '25 rows', '50 rows', 'Show all' ]
         ],
         buttons:['pageLength',
-
+                    {
+                        collectionTitle: 'Visibility control',
+                        extend: 'colvis',
+                        collectionLayout: 'two-column'
+                    },
                     {
                         extend: 'collection',
                         text: 'Export',
-                        className: 'btn btn-info',
-                        buttons:[ 'copy', 'csv', 'excel', 'pdf', 'print',
-                                    {
-                                        collectionTitle: 'Visibility control',
-                                        extend: 'colvis',
-                                        collectionLayout: 'two-column'
-                                    }
-                                ]
+                        className: 'btn btn-secondary',
+                        buttons:[ 'copy', 'csv', 'excel', 'pdf', 'print']
                     },
                     {
                         text: '<i class="fas fa-plus"></i><span> Add Computer</span>',
-                        className: 'btn btn-success',
+                        className: 'btn btn-secondary',
                         action: function ( e, dt, node, config ) {
+                            for( a=0;a<8;a++)
+                            {
+                                $('#error'+arrayerror[a]).html('');
+                            }
                             $('#computersave').val("create Computer");
                             $('#computersave').html('Save');
                             $('#computerid').val('');
@@ -269,16 +299,14 @@
         });
 
 
-        $('#computerform').on("submit",function (event) {
-            event.preventDefault();
-            $('#computersave').html('Sending..');
-            var formdata = new FormData($(this)[0]);
+        $('#computersave').click(function (e) {
+            e.preventDefault();
+            $(this).html('Sending..');
             $.ajax({
+                data: $('#computerform').serialize(),
                 url: "{{ route('computer.store') }}",
                 type: "POST",
-                data: formdata,
-                processData: false,
-                contentType: false,
+                dataType: 'json',
                 success: function (data) {
 
                     $('#computerform').trigger("reset");
@@ -290,7 +318,13 @@
                 error: function (data) {
                     console.log('Error:', data);
                     $('#computersave').html('Save Changes');
-                    alert('Status: ' + data);
+                    for( a=0;a<8;a++)
+                    {
+                        $('#error'+arrayerror[a]).html('');
+                    }
+                    $.each(data.responseJSON.errors, function(key,value) {
+                        $('#error'+key).append('<div class="text-danger mt-2">'+value+'</div');
+                    });
                 }
             });
         });
@@ -299,17 +333,23 @@
             var computerid = $(this).attr('id');
             $.get("{{ route('computer.index') }}" +'/' + computerid +'/edit', function (data)
             {
+                for( a=0;a<8;a++)
+                    {
+                        $('#error'+arrayerror[a]).html('');
+                    }
                 $('#modelHeading').html("Edit Data Computer");
                 $('#computersave').val("edit-computer");
                 $('#computersave').html('Save Changes');
-                $('#ajaxModel').modal('show');
+                $('#computermodal').modal('show');
                 $('#computerid').val(data.id);
-                $('#nocomputer').val(data.NoComputer);
-                $('#cpu').val(data.CPU);
-                $('#printer').val(data.Printer);
-                $('#drawer').val(data.Drawer);
-                $('#scanner').val(data.Scanner);
-                $('#monitor').val(data.Monitor);
+                $('#nocomputer').val(data.nocomputer);
+                $('#selectnocounter').val(data.nocounter);
+                $('#type').val(data.type);
+                $('#printer').val(data.printer);
+                $('#drawer').val(data.drawer);
+                $('#scanner').val(data.scanner);
+                $('#monitor').val(data.monitor);
+                $('#status').val(data.status);
             })
         });
 
@@ -378,4 +418,5 @@
     });
 
 </script>
-@endsection
+@endpush
+

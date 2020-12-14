@@ -18,7 +18,7 @@ class CreateEdcsTable extends Migration
             $table->foreignId('counter_id');
             $table->string('tidedc');
             $table->string('midedc');
-            $table->string('ipaddress');
+            $table->string('ipaddress')->unique();
             $table->string('connection');
             $table->string('simcard');
             $table->string('type');
@@ -26,7 +26,7 @@ class CreateEdcsTable extends Migration
             $table->string('author')->nullable();
             $table->timestamps();
             $table->softDeletes();
-            $table->unique(['tidedc', 'ipaddress']);
+            //$table->unique(['tidedc', 'ipaddress']);
         });
     }
 

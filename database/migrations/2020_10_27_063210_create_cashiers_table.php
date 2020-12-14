@@ -20,7 +20,7 @@ class CreateCashiersTable extends Migration
             $table->string('fullname');
             $table->date('dateofbirth');
             $table->string('address');
-            $table->string('phonenumber');
+            $table->string('phonenumber')->unique();
             $table->string('position');
             $table->date('joindate');
             $table->string('avatar');

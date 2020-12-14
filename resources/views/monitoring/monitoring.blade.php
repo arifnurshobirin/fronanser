@@ -54,19 +54,19 @@
                 <div class="filter-container">
                     @foreach($datacounter as $listcounter)
                         @if($listcounter->status == 'Queueing')
-                    <div class="col-lg-2 col-sm-6 col-xs-6 filtr-item" data-category="1" data-sort="{{$listcounter->nocounter}}">
+                    <div class="col-lg-2 col-3 col-xs-12 filtr-item" data-category="1" data-sort="{{$listcounter->nocounter}}">
                         <!-- small card -->
                         <div id="changecolor" class="small-box bg-gradient-danger">
                         @elseif($listcounter->status == 'Active')
-                    <div class="col-lg-2 col-sm-6 col-xs-6 filtr-item" data-category="2" data-sort="{{$listcounter->nocounter}}">
+                    <div class="col-lg-2 col-3 col-xs-12 filtr-item" data-category="2" data-sort="{{$listcounter->nocounter}}">
                         <!-- small card -->
                         <div id="changecolor{{$listcounter->Connection}}" class="small-box bg-gradient-success">
                         @elseif($listcounter->status == 'Inactive')
-                    <div class="col-lg-2 col-sm-6 col-xs-6 filtr-item" data-category="3" data-sort="{{$listcounter->nocounter}}">
+                    <div class="col-lg-2 col-3 col-xs-12 filtr-item" data-category="3" data-sort="{{$listcounter->nocounter}}">
                         <!-- small card -->
                         <div id="changecolor" class="small-box bg-gradient-warning">
                         @elseif($listcounter->status == 'Broken')
-                    <div class="col-lg-2 col-sm-6 col-xs-6 filtr-item" data-category="4" data-sort="{{$listcounter->nocounter}}">
+                    <div class="col-lg-2 col-3 col-xs-12 filtr-item" data-category="4" data-sort="{{$listcounter->nocounter}}">
                         <!-- small card -->
                         <div id="changecolor" class="small-box bg-gradient-secondary">
                         @endif
@@ -77,21 +77,24 @@
                             </div>
                             <div class="icon">
                                 @if($listcounter->status == 'Queueing')
-                                <i class="fas fa-user"></i>
+                                <i class="fas fa-user-shield"></i>
                                 @elseif($listcounter->status == 'Active')
                                 <i class="fas fa-user"></i>
                                 @elseif($listcounter->status == 'Inactive')
-                                <i class="fas fa-cash-register"></i>
+                                <i class="fas fa-user-plus"></i>
                                 @elseif($listcounter->status == 'Broken')
                                 <i class="fas fa-cash-register"></i>
                                 @endif
                             </div>
+                            {{-- <a type="button" class="small-box-footer edcshow">
+                                More info <i class="fas fa-arrow-circle-right" id="{{$listcounter->id}}" name="{{$listcounter->nocounter}}"></i>
+                            </a> --}}
                             {{-- <a href={{ url('admin/monitoring/'.$listcounter->id) }} class="btn btn-block bg-dark" >EDC <i class="fas fa-fax"></i>
                             </a> --}}
                             {{-- <button type="button" class="btn btn-block bg-dark" data-toggle="modal" data-target="#edcmodal{{$listcounter->nocounter}}">
                                 EDC <i class="fas fa-fax"></i>
                             </button> --}}
-                            <a type="button" class="btn btn-block bg-dark edcshow" id="{{$listcounter->id}}" name="{{$listcounter->nocounter}}">
+                            <a type="button" class="small-box-footer edcshow" id="{{$listcounter->id}}" name="{{$listcounter->nocounter}}">
                                 EDC <i class="fas fa-fax"></i>
                             </a>
                         </div>
@@ -150,7 +153,7 @@
         });
 
         $(document).on('click', '.edcshow', function () {
-            $('.edcshow').addClass('disabled');
+            $('.edcshow').prop('disabled', true);
             var id = $(this).attr('id');
             var nocounter = $(this).attr('name');
             judul = "Detail EDC POS ".concat(nocounter);
@@ -158,48 +161,54 @@
             $.get("{{ route('monitoring.index') }}" +'/' + id, function (dataedc)
             {
                 var objectedc= dataedc;
-                var linkimage="{{ asset('dashboard/img/')}}"
-                //console.log(objectedc);
-                objectedc.forEach(function(ambilData, data){
+                var linkimage="{{ asset('dashboard/img/')}}";
+                if($.isEmptyObject(objectedc)) {
                     $('#edcmodal').modal('show');
-                    $('#createedc').append("<div class='card bg-light'>"+
-                                                "<div class='card-header text-muted border-bottom-0'>Electronic Data Capture</div>"+
-                                                "<div class='card-body pt-0'>"+
-                                                    "<div class='row'>"+
-                                                        "<div class='col-7'>"+
-                                                            "<h2 class='lead'><b id='headedc'>EDC "+ambilData.type+"</b></h2>"+
-                                                            "<p class='text-muted text-sm'><b id='tidedc'>TID: "+ambilData.tidedc+"</b> </p>"+
-                                                            "<ul class='ml-4 mb-0 fa-ul text-muted' id='createedc'>"+
-                                                                "<li class='small' id='statusedc'>"+
-                                                                    "<span class='fa-li'><i class='fas fa-lg fa-fax'></i></span>"+
-                                                                    "Status: <span class='badge badge-primary'>"+ambilData.status+"</span>"+
-                                                                "</li>"+
-                                                                "<li class='small' id='connectionedc'>"+
-                                                                    "<span class='fa-li'><i class='fas fa-lg fa-sim-card'></i></span>Connection: "+ambilData.connection+
-                                                                "</li>"+
-                                                            "</ul>"+
+                }
+                else
+                {
+                    objectedc.forEach(function(ambilData, data){
+                        $('#edcmodal').modal('show');
+                        $('#createedc').append("<div class='card bg-light'>"+
+                                                    "<div class='card-header text-muted border-bottom-0'>Electronic Data Capture</div>"+
+                                                    "<div class='card-body pt-0'>"+
+                                                        "<div class='row'>"+
+                                                            "<div class='col-7'>"+
+                                                                "<h2 class='lead'><b id='headedc'>EDC "+ambilData.type+"</b></h2>"+
+                                                                "<p class='text-muted text-sm'><b id='tidedc'>TID: "+ambilData.tidedc+"</b> </p>"+
+                                                                "<ul class='ml-4 mb-0 fa-ul text-muted' id='createedc'>"+
+                                                                    "<li class='small' id='statusedc'>"+
+                                                                        "<span class='fa-li'><i class='fas fa-lg fa-fax'></i></span>"+
+                                                                        "Status: <span class='badge badge-primary'>"+ambilData.status+"</span>"+
+                                                                    "</li>"+
+                                                                    "<li class='small' id='connectionedc'>"+
+                                                                        "<span class='fa-li'><i class='fas fa-lg fa-sim-card'></i></span>Connection: "+ambilData.connection+
+                                                                    "</li>"+
+                                                                "</ul>"+
+                                                            "</div>"+
+                                                            "<div class='col-5 text-center'><img src="+
+                                                            linkimage+"/"+ambilData.type+".jpg"+
+                                                            " alt='' class='img-circle img-fluid'></div>"+
                                                         "</div>"+
-                                                        "<div class='col-5 text-center'><img src="+
-                                                        linkimage+"/"+ambilData.type+".jpg"+
-                                                        " alt='' class='img-circle img-fluid'></div>"+
                                                     "</div>"+
-                                                "</div>"+
-                                                "<div class='card-footer'>"+
-                                                    "<div class='text-right'><a href="+
-                                                    "{{ route('edc.index') }}"+
-                                                    " class='btn btn-sm bg-secondary'>"+
-                                                        "<i class='fas fa-cogs'></i></a>"+
-                                                        "   <a href="+"{{ route('edc.index') }}/7"+" class='edcprofile btn btn-sm btn-secondary' id='7'>"+
-                                                        "<i class='fas fa-user'></i> View Profile</a>"+
+                                                    "<div class='card-footer'>"+
+                                                        "<div class='text-right'><a href="+
+                                                        "{{ route('edc.index') }}"+
+                                                        " class='btn btn-sm bg-secondary'>"+
+                                                            "<i class='fas fa-cogs'></i></a>"+
+                                                            "   <a href="+"{{ route('edc.index') }}/7"+" class='edcprofile btn btn-sm btn-secondary' id='7'>"+
+                                                            "<i class='fas fa-user'></i> View Profile</a>"+
+                                                        "</div>"+
                                                     "</div>"+
-                                                "</div>"+
-                                            "</div>");
-                })
+                                                "</div>");
+                    })
+                }
+
             })
         });
 
         $(document).on('click', '#resetmodal', function () {
-            $('.edcshow').removeClass('disabled');
+            $('.edcshow').prop('disabled', false);
             $('#createedc').html("");
         });
     });

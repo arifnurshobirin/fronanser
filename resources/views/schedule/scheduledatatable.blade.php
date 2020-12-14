@@ -77,150 +77,193 @@
                     </div>
                 </div>
             </form>
-            <!-- /.filter schedule -->
-            <div class="row">
-                <div class="col-md-7">
-                    <div class="table-responsive">
-                        <table class="table table-bordered table-striped table-hover dataTable js-exportable"
-                            id="ScheduleDatatable" style="width:100%">
-                            <thead class="bg-danger">
-                                <tr>
-                                    <th>Employee Name</th>
-                                    <th>Position</th>
-                                    <th>Week</th>
-                                    <th>Status</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody id="bodytable">
-                            </tbody>
-                            <tfoot class="bg-danger">
-                                <tr>
-                                    <th>Employee Name</th>
-                                    <th>Position</th>
-                                    <th>Week</th>
-                                    <th>Status</th>
-                                    <th>Action</th>
-                                </tr>
-                            </tfoot>
-                        </table>
-                    </div>
-                </div>
-                <div class="col-md-5">
-                    <!-- Profile Image -->
-                    <div class="card card-danger card-outline">
-                        <div class="card-body box-profile">
-                            <div class="text-center">
-                                <img class="profile-user-img img-fluid img-circle" id="avatarschedule" src="{{ asset('dashboard/img/avatar.png') }}" alt="User">
-                            </div>
-                            <h3 class="profile-username text-center" id="fullnameschedule">Null</h3>
-                            <p class="text-muted text-center" id="positionschedule">Null</p>
-                            <form method="post" id="scheduleformcreate" name="scheduleformcreate">
-                                @csrf
-                            <div class="form-group row">
-                                <label for="labeldate" id="labelweeknumber" name="labelweeknumber" class="col-sm-3 col-form-label">Week </label>
-                                <button type="submit" class="btn btn-primary col-sm-7" id="schedulesave" value="create">Save</button>
-                                <label class="col-form-label col-sm-2" id="labeltotalwh" name="labeltotalwh">0 Hour</label>
-                            </div>
-                            <input type="hidden" name="scheduleid" id="scheduleid">
-                            <div class="form-group row">
-                                <label for="labeldate" id="day1" class="col-sm-3 col-form-label">Day 1 :</label>
-                                <div class="form-line col-sm-2">
-                                    <input type="text" class="form-control input-uppercase" id="codeshift1" name="codeshift1" oninput="datashift(1)">
-                                </div>
-                                <div class="form-line col-sm-5">
-                                <input type="text" class="form-control" id="inputshift1" name="inputshift1" readonly>
-                                </div>
-                                <div class="form-line col-sm-2">
-                                    <label class="col-form-label" id="labelhour1" name="labelhour">0</label>
-                                    Hour
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <label for="labeldate"  id="day2" class="col-sm-3 col-form-label">Day 2 :</label>
-                                <div class="form-line col-sm-2">
-                                    <input type="text" class="form-control input-uppercase" id="codeshift2" name="codeshift2" oninput="datashift(2)">
-                                </div>
-                                <div class="form-line col-sm-5">
-                                <input type="text" class="form-control" id="inputshift2" name="inputshif2t" readonly>
-                                </div>
-                                <div class="form-line col-sm-2">
-                                    <label class="col-form-label" id="labelhour2" name="labelhour">0</label>
-                                    Hour
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <label for="labeldate"  id="day3" class="col-sm-3 col-form-label">Day 3 :</label>
-                                <div class="form-line col-sm-2">
-                                    <input type="text" class="form-control input-uppercase" id="codeshift3" name="codeshift3" oninput="datashift(3)">
-                                </div>
-                                <div class="form-line col-sm-5">
-                                <input type="text" class="form-control" id="inputshift3" name="inputshift3" readonly>
-                                </div>
-                                <div class="form-line col-sm-2">
-                                    <label class="col-form-label" id="labelhour3" name="labelhour">0</label>
-                                    Hour
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <label for="labeldate"  id="day4" class="col-sm-3 col-form-label">Day 4 :</label>
-                                <div class="form-line col-sm-2">
-                                    <input type="text" class="form-control input-uppercase" id="codeshift4" name="codeshift4" oninput="datashift(4)">
-                                </div>
-                                <div class="form-line col-sm-5">
-                                <input type="text" class="form-control" id="inputshift4" name="inputshift4" readonly>
-                                </div>
-                                <div class="form-line col-sm-2">
-                                    <label class="col-form-label" id="labelhour4" name="labelhour">0</label>
-                                    Hour
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <label for="labeldate"  id="day5" class="col-sm-3 col-form-label">Day 5 :</label>
-                                <div class="form-line col-sm-2">
-                                    <input type="text" class="form-control input-uppercase" id="codeshift5" name="codeshift5" oninput="datashift(5)">
-                                </div>
-                                <div class="form-line col-sm-5">
-                                <input type="text" class="form-control" id="inputshift5" name="inputshift5" readonly>
-                                </div>
-                                <div class="form-line col-sm-2">
-                                    <label class="col-form-label" id="labelhour5" name="labelhour">0</label>
-                                    Hour
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <label for="labeldate"  id="day6" class="col-sm-3 col-form-label">Day 6 :</label>
-                                <div class="form-line col-sm-2">
-                                    <input type="text" class="form-control input-uppercase" id="codeshift6" name="codeshift6" oninput="datashift(6)">
-                                </div>
-                                <div class="form-line col-sm-5">
-                                <input type="text" class="form-control" id="inputshift6" name="inputshift6" readonly>
-                                </div>
-                                <div class="form-line col-sm-2">
-                                    <label class="col-form-label" id="labelhour6" name="labelhour">0</label>
-                                    Hour
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <label for="labeldate"   id="day7" class="col-sm-3 col-form-label">Day 7 :</label>
-                                <div class="form-line col-sm-2">
-                                    <input type="text" class="form-control input-uppercase" id="codeshift7" name="codeshift7" oninput="datashift(7)">
-                                </div>
-                                <div class="form-line col-sm-5">
-                                <input type="text" class="form-control" id="inputshift7" name="inputshift7" readonly>
-                                </div>
-                                <div class="form-line col-sm-2">
-                                    <label class="col-form-label" id="labelhour7" name="labelhour">0</label>
-                                    Hour
-                                </div>
-                            </div>
-                            </form>
-                        </div>
-                        <!-- /.card-body -->
-                    </div>
-                    <!-- /.card -->
+        </div>
+        <!-- /.filter schedule -->
+        <!-- /.card-body -->
+        <div class="card-footer">
+            Project Website Cashier Carrefour Taman Palem
+        </div>
+    </div>
+    <!-- /.card -->
+
+    <div class="row">
+        <!-- Default box -->
+        <div class="card card-danger card-outline col-md-7">
+            <div class="card-header">
+                <h3 class="card-title"><i class="fas fa-calendar-check"></i> Schedule DataTable</h3>
+                <div class="card-tools">
+                    <button type="button" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip"
+                        title="Collapse">
+                        <i class="fas fa-minus"></i></button>
+                    <button type="button" class="btn btn-tool" data-card-widget="remove" data-toggle="tooltip"
+                        title="Remove">
+                        <i class="fas fa-times"></i></button>
                 </div>
             </div>
+            <!-- /.card-header -->
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped table-hover dataTable js-exportable"
+                        id="ScheduleDatatable" style="width:100%">
+                        <thead class="bg-danger">
+                            <tr>
+                                <th>Employee Name</th>
+                                <th>Position</th>
+                                <th>Week</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bodytable">
+                        </tbody>
+                        <tfoot class="bg-danger">
+                            <tr>
+                                <th>Employee Name</th>
+                                <th>Position</th>
+                                <th>Week</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+            <!-- /.card-body -->
+            <div class="card-footer">
+                Project Website Cashier Carrefour Taman Palem
+            </div>
+        </div>
+        <!-- /.card -->
+
+        <!-- Default box -->
+        <div class="card card-danger card-outline col-md-5">
+            <div class="card-header">
+                <h3 class="card-title"><i class="fas fa-calendar-check"></i> Schedule DataTable</h3>
+                <div class="card-tools">
+                    <button type="button" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip"
+                        title="Collapse">
+                        <i class="fas fa-minus"></i></button>
+                    <button type="button" class="btn btn-tool" data-card-widget="remove" data-toggle="tooltip"
+                        title="Remove">
+                        <i class="fas fa-times"></i></button>
+                </div>
+            </div>
+            <!-- /.card-header -->
+            <div class="card-body box-profile">
+                <div class="text-center">
+                    <img class="profile-user-img img-fluid img-circle" id="avatarschedule" src="{{ asset('dashboard/img/avatar.png') }}" alt="User">
+                </div>
+                <h3 class="profile-username text-center" id="fullnameschedule">Null</h3>
+                <p class="text-muted text-center" id="positionschedule">Null</p>
+                <form method="post" id="scheduleformcreate" name="scheduleformcreate">
+                    @csrf
+                <div class="form-group row">
+                    <label for="labeldate" id="labelweeknumber" name="labelweeknumber" class="col-sm-3 col-form-label">Week </label>
+                    <button type="submit" class="btn btn-primary col-sm-7" id="schedulesave" value="create">Save</button>
+                    <label class="col-form-label col-sm-2" id="labeltotalwh" name="labeltotalwh">0 Hour</label>
+                </div>
+                <input type="hidden" name="scheduleid" id="scheduleid">
+                <div class="form-group row">
+                    <label for="labeldate" id="day1" class="col-sm-3 col-form-label">Day 1 :</label>
+                    <div class="form-line col-sm-2">
+                        <input type="text" class="form-control input-uppercase" id="codeshift1" name="codeshift1" oninput="datashift(1)">
+                    </div>
+                    <div class="form-line col-sm-5">
+                    <input type="text" class="form-control" id="inputshift1" name="inputshift1" readonly>
+                    </div>
+                    <div class="form-line col-sm-2">
+                        <label class="col-form-label" id="labelhour1" name="labelhour">0</label>
+                        Hour
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="labeldate"  id="day2" class="col-sm-3 col-form-label">Day 2 :</label>
+                    <div class="form-line col-sm-2">
+                        <input type="text" class="form-control input-uppercase" id="codeshift2" name="codeshift2" oninput="datashift(2)">
+                    </div>
+                    <div class="form-line col-sm-5">
+                    <input type="text" class="form-control" id="inputshift2" name="inputshif2t" readonly>
+                    </div>
+                    <div class="form-line col-sm-2">
+                        <label class="col-form-label" id="labelhour2" name="labelhour">0</label>
+                        Hour
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="labeldate"  id="day3" class="col-sm-3 col-form-label">Day 3 :</label>
+                    <div class="form-line col-sm-2">
+                        <input type="text" class="form-control input-uppercase" id="codeshift3" name="codeshift3" oninput="datashift(3)">
+                    </div>
+                    <div class="form-line col-sm-5">
+                    <input type="text" class="form-control" id="inputshift3" name="inputshift3" readonly>
+                    </div>
+                    <div class="form-line col-sm-2">
+                        <label class="col-form-label" id="labelhour3" name="labelhour">0</label>
+                        Hour
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="labeldate"  id="day4" class="col-sm-3 col-form-label">Day 4 :</label>
+                    <div class="form-line col-sm-2">
+                        <input type="text" class="form-control input-uppercase" id="codeshift4" name="codeshift4" oninput="datashift(4)">
+                    </div>
+                    <div class="form-line col-sm-5">
+                    <input type="text" class="form-control" id="inputshift4" name="inputshift4" readonly>
+                    </div>
+                    <div class="form-line col-sm-2">
+                        <label class="col-form-label" id="labelhour4" name="labelhour">0</label>
+                        Hour
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="labeldate"  id="day5" class="col-sm-3 col-form-label">Day 5 :</label>
+                    <div class="form-line col-sm-2">
+                        <input type="text" class="form-control input-uppercase" id="codeshift5" name="codeshift5" oninput="datashift(5)">
+                    </div>
+                    <div class="form-line col-sm-5">
+                    <input type="text" class="form-control" id="inputshift5" name="inputshift5" readonly>
+                    </div>
+                    <div class="form-line col-sm-2">
+                        <label class="col-form-label" id="labelhour5" name="labelhour">0</label>
+                        Hour
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="labeldate"  id="day6" class="col-sm-3 col-form-label">Day 6 :</label>
+                    <div class="form-line col-sm-2">
+                        <input type="text" class="form-control input-uppercase" id="codeshift6" name="codeshift6" oninput="datashift(6)">
+                    </div>
+                    <div class="form-line col-sm-5">
+                    <input type="text" class="form-control" id="inputshift6" name="inputshift6" readonly>
+                    </div>
+                    <div class="form-line col-sm-2">
+                        <label class="col-form-label" id="labelhour6" name="labelhour">0</label>
+                        Hour
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="labeldate"   id="day7" class="col-sm-3 col-form-label">Day 7 :</label>
+                    <div class="form-line col-sm-2">
+                        <input type="text" class="form-control input-uppercase" id="codeshift7" name="codeshift7" oninput="datashift(7)">
+                    </div>
+                    <div class="form-line col-sm-5">
+                    <input type="text" class="form-control" id="inputshift7" name="inputshift7" readonly>
+                    </div>
+                    <div class="form-line col-sm-2">
+                        <label class="col-form-label" id="labelhour7" name="labelhour">0</label>
+                        Hour
+                    </div>
+                </div>
+                </form>
+            </div>
+            <!-- /.card-body -->
+            <div class="card-footer">
+                Project Website Cashier Carrefour Taman Palem
+            </div>
+        </div>
+        <!-- /.card -->
+    </div>
+
 
             <!-- modal codeshift -->
             <div class="modal fade" id="codeshiftmodal" data-backdrop="static" aria-hidden="true">
@@ -273,13 +316,7 @@
             </div>
             <!-- #END# modal codeshift -->
 
-        </div>
-        <!-- /.card-body -->
-        <div class="card-footer">
-            Project Website Cashier Carrefour Taman Palem
-        </div>
-    </div>
-    <!-- /.card -->
+
 </section>
 <!-- /.content -->
 @endsection
@@ -408,7 +445,7 @@ function datashift(day){
             });
         });
 
-        $(document).on('click', '.createschedule', function () {
+        function loadcreate(){
             $('#bodytable').html("");
             var position = $('#positionselect').val();
             $.ajax({
@@ -438,6 +475,9 @@ function datashift(day){
                     console.log('Error:', data);
                 }
             });
+        }
+        $(document).on('click', '.createschedule', function () {
+            loadcreate();
         });
 
 
@@ -503,6 +543,7 @@ function datashift(day){
                 url:"cashier/"+cashierid,
                 type: "PATCH",
                 success:function(data){
+                    loadcreate();
                     swal.fire("Deleted!", "Your employee status has been Inactive.", "success")
                 }
                 });

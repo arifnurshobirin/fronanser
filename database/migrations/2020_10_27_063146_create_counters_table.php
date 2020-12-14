@@ -15,15 +15,15 @@ class CreateCountersTable extends Migration
     {
         Schema::create('counters', function (Blueprint $table) {
             $table->id();
-            $table->integer('nocounter');
-            $table->ipAddress('ipaddress');
-            $table->macAddress('macaddress');
+            $table->integer('nocounter')->unique();
+            $table->ipAddress('ipaddress')->unique();
+            $table->macAddress('macaddress')->unique();
             $table->string('type');
             $table->string('status');
             $table->string('author')->nullable();
             $table->timestamps();
             $table->softDeletes();
-            $table->unique(['nocounter', 'ipaddress','macaddress']);
+            // $table->unique(['nocounter', 'ipaddress','macaddress']);
         });
     }
 

@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Computer;
-use DataTables;
-use Illuminate\Http\Request;
 use Validator;
+use DataTables;
+use App\Models\Counter;
+use App\Models\Computer;
 Use Alert;
+use Illuminate\Http\Request;
 use Yajra\Datatables\Html\Builder;
 
 class ComputerController extends Controller
@@ -33,6 +34,7 @@ class ComputerController extends Controller
             ->editColumn('status', function ($datacomputer) {
                 if ($datacomputer->status == 'Active') return '<span class="badge badge-success">' .$datacomputer->status.'</span>';
                 if ($datacomputer->status == 'Inactive') return '<span class="badge badge-warning">' .$datacomputer->status.'</span>';
+                if ($datacomputer->status == 'Lock') return '<span class="badge badge-danger">' .$datacomputer->status.'</span>';
                 if ($datacomputer->status == 'Broken') return '<span class="badge badge-secondary">' .$datacomputer->status.'</span>';
                 return 'Null';
             })
@@ -42,7 +44,8 @@ class ComputerController extends Controller
 
     public function index()
     {
-        return view('computer.computerdatatable');
+        $datacounter = Counter::orderBy('nocounter','asc')->get();
+        return view('computer.computerdatatable',compact('datacounter'));
     }
 
     /**
@@ -52,18 +55,7 @@ class ComputerController extends Controller
      */
     public function create()
     {
-        $form_data = array(
-            'Nocomputer' => $request->nocomputer,
-            'CPU' => $request->cpu,
-            'Printer' => $request->printer,
-            'Drawer' => $request->drawer,
-            'Scanner' => $request->scanner,
-            'Monitor' => $request->monitor
-        );
 
-        Computer::updateOrCreate(['id'=>$request->computerid],$form_data);
-
-        return response()->json(['success' => 'Data Added successfully.']);
     }
 
     /**
@@ -74,7 +66,19 @@ class ComputerController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $attr=$request->validate([
+            'nocomputer' => 'required|unique:computers',
+            'counter_id' => 'required',
+            'printer' => 'required',
+            'drawer' => 'required',
+            'scanner' => 'required',
+            'monitor' => 'required',
+            'type' => 'required',
+            'status' => 'required'
+        ]);
+        Computer::updateOrCreate(['id'=>$request->id],$attr);
+        return response()->json(['success' => 'Data Added successfully.']);
+
     }
 
     /**
@@ -95,7 +99,7 @@ class ComputerController extends Controller
      * @param  \App\Computer  $computer
      * @return \Illuminate\Http\Response
      */
-    public function edit(Computer $computer,$id)
+    public function edit($id)
     {
         $data = Computer::find($id);
         return response()->json($data);

@@ -16,7 +16,7 @@ class CreateComputersTable extends Migration
         Schema::create('computers', function (Blueprint $table) {
             $table->id();
             $table->foreignId('counter_id');
-            $table->integer('nocomputer');
+            $table->integer('nocomputer')->unique();
             $table->string('type');
             $table->string('printer');
             $table->string('drawer');
@@ -26,7 +26,7 @@ class CreateComputersTable extends Migration
             $table->string('author')->nullable();
             $table->timestamps();
             $table->softDeletes();
-            $table->unique(['nocomputer']);
+            // $table->unique(['nocomputer']);
         });
     }
 

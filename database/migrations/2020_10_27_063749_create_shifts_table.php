@@ -15,7 +15,7 @@ class CreateShiftsTable extends Migration
     {
         Schema::create('shifts', function (Blueprint $table) {
             $table->id();
-            $table->string('codeshift');
+            $table->string('codeshift')->unique();
             $table->time('startshift');
             $table->time('endshift');
             $table->integer('workinghour');

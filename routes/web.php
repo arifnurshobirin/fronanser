@@ -41,6 +41,7 @@ Route::prefix('admin')->middleware('auth')->group(function(){
 
     Route::get('edc/yajra', [EDCController::class, 'yajra'])->name('edc.yajra');
     Route::resource('edc', EDCController::class);
+    Route::post('edc/store', [EDCController::class, 'store']);
     Route::get('edcdatatable', [EDCController::class, 'datatable'])->name('edc.datatable');
 
     Route::get('edcmoredelete', [EDCController::class, 'moredelete'])->name('edc.moredelete');

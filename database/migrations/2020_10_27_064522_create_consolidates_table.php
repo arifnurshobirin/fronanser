@@ -19,7 +19,7 @@ class CreateConsolidatesTable extends Migration
             $table->foreignId('counter_id');
             $table->foreignId('banknote_id');
             $table->foreignId('coin_id');
-            $table->string('nodeposit');
+            $table->string('nodeposit')->unique();
             $table->date('date');
             $table->time('time');
             $table->string('type');

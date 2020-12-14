@@ -6,8 +6,8 @@ use App\Models\{Edc,Counter};
 use DataTables;
 use App\DataTables\EdcsDataTable;
 use Illuminate\Http\Request;
-//use Validator;
-Use Alert;
+use Validator;
+    Use Alert;
 
 class EdcController extends Controller
 {
@@ -49,7 +49,7 @@ class EdcController extends Controller
     }
     public function index(Request $request)
     {
-        $datacounter = Counter::latest()->orderBy('NoCounter','asc')->get();
+        $datacounter = Counter::orderBy('nocounter','asc')->get();
 
         //$dataedc = Edc::with('counter')->latest()->get();
         //return $dataedc->NoCounter;
@@ -77,30 +77,24 @@ class EdcController extends Controller
         $attr=$request->validate([
             'tidedc' => 'required|min:5',
             'midedc' => 'required|string',
-            'ipaddress' => 'required',
+            'ipaddress' => 'required|unique:edcs',
             'counter_id' => 'required',
             'connection' => 'required',
             'simcard' => 'required',
             'type' => 'required',
             'status' => 'required'
         ]);
-
-        // $form_data = array(
-        //     'TIDEDC' => $request->tidedc,
-        //     'MIDEDC' => $request->midedc,
-        //     'IPAdress' => $request->ipedc,
-        //     'counter_id' => $request->selectnocounter,
-        //     'Connection' => $request->connection,
-        //     'SIMCard' => $request->simcard,
-        //     'TypeEDC' => $request->typeedc,
-        //     'Status' => $request->statusedc
-        // );
-
-
-
         Edc::updateOrCreate(['id'=>$request->id],$attr);
 
-        return back()->with('success', 'Success Message');
+        // if ($attr->fails()) {
+        //     return Redirect::back()->with('error_code', 5);
+        // } else {
+        //     return back()->with('success', 'Success Message');
+        // }
+
+        // return back()->with('success', 'Success Message');
+        return response()->json(['success' => 'Data Added successfully.']);
+
     }
 
     /**
