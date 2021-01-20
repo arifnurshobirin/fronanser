@@ -6,8 +6,9 @@ use App\Models\{Schedule,Cashier,Shift};
 use DataTables;
 use Alert;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\DB;
+use DB;
 use Illuminate\Http\Request;
+use Response;
 
 class ScheduleController extends Controller
 {
@@ -46,12 +47,24 @@ class ScheduleController extends Controller
         // })
         // ->make(true);
         // ->where('position', $positiontable)->where('status', $statustable)
+    //     $duplicates = DB::table('schedules')
+    // ->select('subject', 'book_id')
+    // ->where('group_id', 3)
+    // ->groupBy('subject', 'book_id')
+    // ->havingRaw('COUNT(*) > 1')
+    //->having('account_id', '>', 100)
+    // ->get();
         $positiontable = $request->position;
         $statustable = $request->status;
         $weektable = $request->week;
-        $dataschedule = Schedule::with(['cashier' ,'shift'])->where('week',$weektable)->whereHas('cashier', function($q) use($statustable,$positiontable) {
-                            $q->whereIn('status', $statustable)->whereIn('position',$positiontable); // '=' is optional
-                    })->get();
+        $dataschedule = Schedule::with(['cashier' ,'shift'])
+                        ->where('week',$weektable)
+                        ->whereHas('cashier', function($query) use($statustable,$positiontable) {$query
+                        ->whereIn('status', $statustable)
+                        ->whereIn('position',$positiontable)
+                        ->groupBy('fullname')
+                        ;})
+                        ->get();
         return DataTables::of($dataschedule)
             ->addColumn('EmployeeName', '{{$cashier["employee"]}} - {{$cashier["fullname"]}}')
             ->addColumn('action',
@@ -76,7 +89,7 @@ class ScheduleController extends Controller
     {
         // $datacashier = Cashier::all();
         $datashift = Shift::all();
-        return view('schedule.scheduledatatable',compact('datashift'));
+        return view('schedule.scheduledatatable2',compact('datashift'));
         //return view('schedule.datatable');
     }
 
@@ -97,8 +110,14 @@ class ScheduleController extends Controller
     public function form($id)
     {
          // $dataschedule = Schedule::latest()->get();;where('position',$positiontable)->
+        $startdate = date('2020-12-14');
+        $enddate = date('2020-12-20');
+
         $datacashier = Cashier::find($id);
-        return response()->json($datacashier);
+        $dataschedule= Schedule::with(['cashier','shift'])->where('cashier_id',$id)->whereBetween('date',[$startdate,$enddate])->get();
+        //dd($datacashier,$dataschedule);
+        return Response::json(array('datacashier' => $datacashier,'dataschedule' => $dataschedule));
+        //return Response::json($dataschedule);
     }
 
     public function indexnew()
@@ -148,21 +167,50 @@ class ScheduleController extends Controller
      */
     public function store(Request $request)
     {
-        $arrayday = ['monshift','tueshift','wedshift','thurshift','frishift','saturshift','sunshift'];
+      // $arrayday = ['monshift','tueshift','wedshift','thurshift','frishift','saturshift','sunshift'];
+        $day1 = $request->startdate;
+        $startdate = Carbon::parse($day1);
+
         for($a=0;$a<7;$a++)
         {
-            $fromdatedb = $request->fromdate;
-            $startdate = Carbon::parse($fromdatedb);
             if($a==0){
-                $date[$a] = $startdate;
+                $datescheduleformat[$a] =  $startdate->isoFormat('YYYY-MM-DD');
+                $dateschedule[$a] = Carbon::parse($datescheduleformat[$a]);
             }
             else{
-                $date[$a] =  $startdate->add($a, 'day');
+                $formatdate =  $startdate->addDays(1);
+                $datescheduleformat[$a] = $formatdate->isoFormat('YYYY-MM-DD');
+                $dateschedule[$a] = Carbon::parse($datescheduleformat[$a]);
+            }
+
+            $datacashier[$a] = $request->cashierid;
+            $dataweeknumber[$a] = $request->hiddenweeknumber;
+
+            $code = "codeshift".$a;
+            $shift[$a] = $request->$code;
+            $codeshift[$a] = strtoupper($shift[$a]);
+            $datashift[$a] = Shift::where('codeshift',$codeshift[$a])->get()->toArray();
+            foreach($datashift[$a] as $shift)
+            {
+                    $idshift[$a] = $shift['id'];
             }
         }
-        dd($date[6]);
 
 
+        for($b=0;$b<7;$b++)
+        {
+            $attr=array(
+                'cashier_id' => $datacashier[$b],
+                'shift_id' => $idshift[$b],
+                'week' =>  $dataweeknumber[$b],
+                'date' => $dateschedule[$b],
+            );
+            Schedule::updateOrCreate(['id'=>$request->id],$attr);
+        }
+        return response()->json(['success' => 'Data Added successfully.']);
+
+        // ->exclude(['startshift', 'endshift', 'workinghour', 'created_at','author', 'update_at', 'delete_at'])
+        // ->get();
         //$date[$a]= $newnextdate->isoFormat('YYYY-MM-DD');
 
         // for($a=1;$a<7;$a++)
@@ -171,6 +219,13 @@ class ScheduleController extends Controller
         // $newdate[$a]=date("Y-m-d",strtotime($date[$a]));
         // }
 
+        // $startdate = Carbon::parse($fromdatedb);
+        // if($a==0){
+        //     $date[$a] = $startdate;
+        // }
+        // else{
+        //     $date[$a] =  $startdate->add($a, 'day');
+        // }
 
 
         // $form_data = array(

@@ -125,10 +125,10 @@
                                                 <th>Action</th>
                                             </tr>
                                         </thead>
-                                        <tbody>  
+                                        <tbody>
                                         <tr>
                                             <td>Day</td>
-                                            <td>        
+                                            <td>
                                                 <select class="custom-select" id="selecttype" name="selecttype">
                                                     @foreach($dataworkinghour as $list)
                                                     <option value="{{$list->id}}">{{$list->CodeShift}}</option>
@@ -141,7 +141,7 @@
                                                 <a class="schedulesave dropdown-item" id="{{$list->id}}" onclick="freezeschedule({{$list->id}})"><i class="fas fa-desktop"></i> Save</a>
                                                 <a class="scheduleedit dropdown-item" id="{{$list->id}}" onclick="editschedule({{$list->id}})"><i class="fas fa-edit"></i> Edit</a>
                                                 <a class="scheduledelete dropdown-item" id="{{$list->id}}"><i class="fas fa-trash"></i> Delete</a>
-                                                </div></div></td>    
+                                                </div></div></td>
                                         </tr>
                                         </tbody>
                                         <tfoot>
@@ -186,9 +186,9 @@
                                             </tr>
                                         </thead>
                                         <!-- <tbody>
-                            @foreach($dataworkinghour as $list)        
+                            @foreach($dataworkinghour as $list)
                             <tr>
-                                
+
                             </tr>
                             @endforeach
                         </tbody> -->
@@ -295,7 +295,7 @@ function shifthour(id){
         // }
         timework = 0;
 
-    } 
+    }
     for( c=0;c<7;c++)
     {
         joinchildhour = arrchildhour[c].concat(id);
@@ -311,7 +311,7 @@ function shifthour(id){
     $('#'+joinchildtotalhour).html(totaltimework+ " Hour");
     totaltimework=0;
     console.log('totaltimework0 '+totaltimework);
-    
+
         // hour2= $('#childhourtue18').html();
         // hour3= $('#childhourwed18').html();
         // hour4= $('#childhourthur18').html();
@@ -319,7 +319,7 @@ function shifthour(id){
         // hour6= $('#childhoursatur18').html();
         // hour7= $('#childhoursun18').html();
         // totaltimework= parseInt(hour1)+parseInt(hour2)+parseInt(hour3)+parseInt(hour4)+parseInt(hour5)+parseInt(hour6)+parseInt(hour7)+ " Hour";
-        
+
     // $('#'+joinchildtotalhour).html(totaltimework);
 
 }
@@ -368,14 +368,14 @@ function freezeschedule(id){
     $('#'+joinchildtotalhour).html(totaltimework);
 
     // $('#ShiftDatatable tr:last').after('<tr>...</tr><tr>...</tr>');
-    
+
 }
 function freezeshift(id){
     var arrayshift = ['code','start','end','hour']
     for( a=0;a<4;a++)
     {
         joinshift = arrayshift[a].concat(id);
-        
+
         $('#'+joinshift).attr("readonly",true);
         document.getElementById(joinshift).className = "form-control input-uppercase";
     }
@@ -389,7 +389,7 @@ function editschedule(id){
         joinday = arrayday[a].concat(id);
         $('#'+joinday).removeAttr("readonly");
         document.getElementById(joinday).className = "form-control is-warning input-uppercase";
-    }   
+    }
 }
 
 function editshift(id){
@@ -397,7 +397,7 @@ function editshift(id){
     for( a=0;a<4;a++)
     {
         joinshift = arrayshift[a].concat(id);
-        
+
         $('#'+joinshift).removeAttr("readonly");
         document.getElementById(joinshift).className = "form-control is-warning input-uppercase";
     }
@@ -431,7 +431,7 @@ function editshift(id){
             [ '10 rows', '25 rows', '50 rows', 'Show all' ]
         ],
         buttons:['pageLength',
-                    
+
                         {
                             extend: 'collection',
                             text: 'Export',
@@ -469,14 +469,14 @@ function editshift(id){
                             }
                         }
                     ]
-        
+
         });
 
         // Add event listener for opening and closing details
         $('#ScheduleAddDatatable').on('click', 'td.details-control', function () {
             var tr = $(this).closest('tr');
             var row = table.row( tr );
-            
+
             if ( row.child.isShown() ) {
                 // This row is already open - close it
                 row.child.hide();
@@ -519,7 +519,7 @@ function editshift(id){
             });
         });
 
-        
+
         var scheduleid;
             $(document).on('click', '.scheduledelete', function(){
             scheduleid = $(this).attr('id');
@@ -588,7 +588,7 @@ function editshift(id){
                     day = new Date(day);
                     day.setDate(day.getDate()+1);
                 }
-                formatday = moment(day).format('dddd DD MMMM YYYY');    
+                formatday = moment(day).format('dddd DD MMMM YYYY');
                 $('#day'+i).html(formatday);
             }
             var enddate = moment(day).format('MMMM DD YYYY');
@@ -600,7 +600,7 @@ function editshift(id){
         processing: true,
         serverSide: true,
         ajax: { url:"{{ route('workinghour.index') }}",},
-        
+
         responsive: true,
         columns: [
             { data: 'CodeShift', name: 'CodeShift' },
@@ -608,7 +608,7 @@ function editshift(id){
             { data: 'EndShift', name: 'EndShift'},
             { data: 'WorkingHour', name: 'WorkingHour'},
             { data: 'action', name: 'action', orderable: false,searchable: false}
-            ] 
+            ]
         });
 
         var code = 1;
@@ -625,8 +625,70 @@ function editshift(id){
         });
         // Automatically add a first row of data
         // $('#createcodeshift').click();
-    
-    
+     // $('#scheduleform').on("submit",function (event) {
+        //     event.preventDefault();
+        //     // console.log(document.getElementById("scheduleshow"));
+        //     // console.log($(this)[0]);
+        //     var formdata = new FormData($(this)[0]);
+        //     // console.log(formdata);
+        //     var table = $('#ScheduleDatatable').DataTable({
+        //         destroy: true,
+        //         // retrieve: true,
+        //         processing: true,
+        //         serverSide: true,
+        //         ajax: {
+        //             url:"{{ route('schedule.datatablepost') }}",
+        //             type: "POST",
+        //             data: function ( d ) {
+        //                     d.week = $('#weekinput').val();
+        //                     d.position = $('#positionselect').val();
+        //                     d.status = $('#statusselect').val();
+        //                     }
+        //             // processData: false,
+        //             // contentType: false
+        //             },
+        //         columns: [
+        //             { data: 'EmployeeName', name: 'EmployeeName' },
+        //             { data: 'cashier.position', name: 'cashier.position' },
+        //             { data: 'week', name: 'week' },
+        //             { data: 'cashier.status', name: 'cashier.status' },
+        //             { data: 'action', name: 'action', orderable: false}
+        //         ],
+        //         order: [[ 0, "asc" ]],
+        //         dom: 'Bfrtip',
+        //         lengthMenu: [
+        //         [ 10, 25, 50, -1 ],
+        //         [ '10 rows', '25 rows', '50 rows', 'Show all' ]
+        //         ],
+        //         buttons:['pageLength',
+        //             {
+        //                 extend: 'collection',
+        //                 text: 'Export',
+        //                 className: 'btn btn-info',
+        //                 buttons:[ 'copy', 'csv', 'excel', 'pdf', 'print',
+        //                             {
+        //                                 collectionTitle: 'Visibility control',
+        //                                 extend: 'colvis',
+        //                                 collectionLayout: 'two-column'
+        //                             }
+        //                         ]
+        //             },
+        //             {
+        //                 text: '<i class="fas fa-user-clock"></i><span> Code Shift</span>',
+        //                 className: 'btn btn-success',
+        //                 action: function ( e, dt, node, config ) {
+        //                     $('#savebutton').val("create-schedule");
+        //                     $('#savebutton').html('Save');
+        //                     $('#scheduleid').val('');
+        //                     $('#scheduleform').trigger("reset");
+        //                     $('#modelHeading').html("Create New Schedule");
+        //                     $('#codeshiftmodal').modal('show');
+        //                 }
+        //             }
+        //         ]
+        //     });
+        // });
+
     });
 </script>
 @endsection
