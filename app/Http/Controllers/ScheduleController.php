@@ -8,15 +8,12 @@ use Alert;
 use Carbon\Carbon;
 use DB;
 use Illuminate\Http\Request;
+use LengthException;
 use Response;
 
 class ScheduleController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+
     public function datatable(Request $request)
     {
 
@@ -90,21 +87,17 @@ class ScheduleController extends Controller
         // $datacashier = Cashier::all();
         $datashift = Shift::all();
         return view('schedule.scheduledatatable2',compact('datashift'));
-        //return view('schedule.datatable');
     }
 
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function create(Request $request)
     {
-         // $dataschedule = Schedule::latest()->get();;where('position',$positiontable)->
         $positiontable = $request->position;
+        $weektable = $request->week;
         $datacashier = Cashier::whereIn('position',$positiontable)->where('status','Active')->orderBy('employee','ASC')->get();
-        return response()->json($datacashier);
+        $dataschedule = Schedule::with(['cashier' ,'shift'])->where('week',$weektable)->orderBy('id','ASC')->get();
+
+        //return response()->json($datacashier);
+        return Response::json(array('datacashier' => $datacashier,'dataschedule' => $dataschedule));
     }
 
     public function form($id)
@@ -154,134 +147,71 @@ class ScheduleController extends Controller
 
     }
 
-    // public function create(Request $request)
-    // {
-
-    // }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
-      // $arrayday = ['monshift','tueshift','wedshift','thurshift','frishift','saturshift','sunshift'];
-        $day1 = $request->startdate;
-        $startdate = Carbon::parse($day1);
+        $arraycode = ['codemonday','codetuesday','codewednesday','codethursday','codefriday','codesaturday','codesunday'];
+        $arrayid = ['idmonday','idtuesday','idwednesday','idthursday','idfriday','idsaturday','idsunday'];
+        $dataweek = $request->weekinput;
+        $startdate = Carbon::parse($request->dateinput);
+        $positiontable = explode(',', $request->positionhidden);
+        $datacashier = Cashier::whereIn('position',$positiontable)->where('status','Active')->orderBy('employee','ASC')->pluck('id')->toArray();
 
-        for($a=0;$a<7;$a++)
-        {
-            if($a==0){
-                $datescheduleformat[$a] =  $startdate->isoFormat('YYYY-MM-DD');
-                $dateschedule[$a] = Carbon::parse($datescheduleformat[$a]);
-            }
-            else{
-                $formatdate =  $startdate->addDays(1);
-                $datescheduleformat[$a] = $formatdate->isoFormat('YYYY-MM-DD');
-                $dateschedule[$a] = Carbon::parse($datescheduleformat[$a]);
-            }
-
-            $datacashier[$a] = $request->cashierid;
-            $dataweeknumber[$a] = $request->hiddenweeknumber;
-
-            $code = "codeshift".$a;
-            $shift[$a] = $request->$code;
-            $codeshift[$a] = strtoupper($shift[$a]);
-            $datashift[$a] = Shift::where('codeshift',$codeshift[$a])->get()->toArray();
-            foreach($datashift[$a] as $shift)
+        for($b=0;$b<count($datacashier);$b++){
+            for($c=0;$c<7;$c++)
             {
-                    $idshift[$a] = $shift['id'];
+                if($c==0){
+                    $dateformat =  $startdate->isoFormat('YYYY-MM-DD');
+                    $dateschedule = Carbon::parse($dateformat);
+                }
+                else{
+                    $dateadd =  $startdate->addDays(1);
+                    $dateformat = $dateadd->isoFormat('YYYY-MM-DD');
+                    $dateschedule = Carbon::parse($dateformat);
+                }
+
+                $code = $arraycode[$c] .$b;
+                $shift = $request->$code;
+                $codeshift = strtoupper($shift);
+                $datashift = Shift::where('codeshift',$codeshift)->pluck('id')->toArray();
+
+                $id = $arrayid[$c] .$b;
+                $dataid = $request->$id;
+
+                if(count($datashift) > 0){
+                    $attr=array(
+                        'cashier_id' => $datacashier[$b],
+                        'shift_id' => $datashift[0],
+                        'week' =>  $dataweek,
+                        'date' => $dateschedule,
+                    );
+                    Schedule::updateOrCreate(['id'=>$dataid],$attr);
+                }
+                else{
+                    return response()->json(['error' => 'Please check Your Schedule, status have not save.']);
+                }
             }
-        }
-
-
-        for($b=0;$b<7;$b++)
-        {
-            $attr=array(
-                'cashier_id' => $datacashier[$b],
-                'shift_id' => $idshift[$b],
-                'week' =>  $dataweeknumber[$b],
-                'date' => $dateschedule[$b],
-            );
-            Schedule::updateOrCreate(['id'=>$request->id],$attr);
         }
         return response()->json(['success' => 'Data Added successfully.']);
 
-        // ->exclude(['startshift', 'endshift', 'workinghour', 'created_at','author', 'update_at', 'delete_at'])
-        // ->get();
-        //$date[$a]= $newnextdate->isoFormat('YYYY-MM-DD');
-
-        // for($a=1;$a<7;$a++)
-        // {
-        // $date[$a] = $request->day+$a;
-        // $newdate[$a]=date("Y-m-d",strtotime($date[$a]));
-        // }
-
-        // $startdate = Carbon::parse($fromdatedb);
-        // if($a==0){
-        //     $date[$a] = $startdate;
-        // }
-        // else{
-        //     $date[$a] =  $startdate->add($a, 'day');
-        // }
-
-
-        // $form_data = array(
-        //     'Employee' => $emp,
-        //     'FullName' => $name,
-        //     'Date' => $date,
-        //     'CodeShift' => $codeshift
-        // );
-
-        // Schedule::updateOrCreate($form_data);
-
-        // return response()->json(['success' => 'Data Added successfully.']);
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Schedule  $schedule
-     * @return \Illuminate\Http\Response
-     */
     public function show($id)
     {
         $data = Schedule::findOrFail($id);
         return view('schedule.scheduleprofile',compact('data'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Schedule  $schedule
-     * @return \Illuminate\Http\Response
-     */
     public function edit($id)
     {
         $data = Schedule::with(['cashier' ,'shift'])->find($id);
         return response()->json($data);
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Schedule  $schedule
-     * @return \Illuminate\Http\Response
-     */
     public function update(Request $request, Schedule $schedule)
     {
         //
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Schedule  $schedule
-     * @return \Illuminate\Http\Response
-     */
     public function destroy($id)
     {
         $data = Schedule::findOrFail($id);
