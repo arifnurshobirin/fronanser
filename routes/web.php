@@ -41,7 +41,6 @@ Route::prefix('admin')->middleware('auth')->group(function(){
 
     Route::get('edc/yajra', [EDCController::class, 'yajra'])->name('edc.yajra');
     Route::resource('edc', EDCController::class);
-    Route::post('edc/store', [EDCController::class, 'store']);
     Route::get('edcdatatable', [EDCController::class, 'datatable'])->name('edc.datatable');
 
     Route::get('edcmoredelete', [EDCController::class, 'moredelete'])->name('edc.moredelete');
@@ -71,6 +70,8 @@ Route::prefix('admin')->middleware('auth')->group(function(){
     Route::get('monitoring/destroy/{id}', [MonitoringController::class, 'destroy']);
 
     Route::resource('chronology', ActivityController::class);
+    Route::get('chronologydatatable', [ActivityController::class, 'datatable'])->name('chronology.datatable');
+
     Route::get('reminder', [ActivityController::class, 'reminder'])->name('reminder');
     Route::get('performance', [ActivityController::class, 'performance'])->name('performance');
     Route::get('pratice', [ActivityController::class, 'pratice'])->name('pratice');

@@ -2,7 +2,7 @@
 
 namespace Database\Factories;
 
-use App\Models\{Activity,Cashier,Counter,Schedule,Shift};
+use App\Models\{Activity,Counter,Schedule};
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class ActivityFactory extends Factory
@@ -22,9 +22,7 @@ class ActivityFactory extends Factory
     public function definition()
     {
         return [
-            'cashier_id' =>Cashier::factory(),
             'schedule_id' =>Schedule::factory(),
-            'shift_id' =>Shift::factory(),
             'counter_id' =>Counter::factory(),
             'in' =>$this->faker->time($format = 'H:i:s', $max = 'now'),
             'break' =>$this->faker->time($format = 'H:i:s', $max = 'now'),

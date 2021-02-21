@@ -13,7 +13,7 @@
     <!-- Default box -->
     <div class="card card-danger card-outline">
         <div class="card-header">
-            <h3 class="card-title"><i class="fas fa-clipboard-list"></i> Chronology Page</h3>
+            <h3 class="card-title"><i class="fas fa-clipboard-list"></i> Chronology DataTable</h3>
             <div class="card-tools">
                 <button type="button" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip"
                     title="Collapse">
@@ -25,38 +25,47 @@
         </div>
         <!-- /.card-header -->
         <div class="card-body">
+            <div class="row justify-content-md-center">
+                <div class="col-md-4">
+                    <label id="labelname">Activity : Cashier Division</label><br>
+                    <label id="labelweek">Week : {{ $today->format('W') }} </label><br>
+                    <label id="labeldate">Date : {{ date('d-M-Y') }} </label>
+                </div>
+                <div class="col-md-4 text-center">
+                    <button type="submit" name="saveschedule" id="saveschedule" class="btn btn-app bg-primary"><i class="fas fa-save"></i> Save Schedule</button>
+                </div>
+                <div class="col-md-4 text-right">
+                    <button type="button" name="backschedule" id="backschedule" class="btn btn-secondary"><i class="fas fa-hand-point-left"></i> Back</button>
+                    <button type="button" name="nextschedule" id="nextschedule" class="btn btn-secondary">Next <i class="fas fa-hand-point-right"></i></button>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown"><i class="fas fa-desktop"></i> Show</button>
+                        <div class="dropdown-menu dropdown-menu-right" role="menu">
+                            <a class="createform dropdown-item" onclick="lockschedule()"><i class="fas fa-desktop"></i> Lock</a>
+                            <a class="editform dropdown-item"  onclick="editschedule()"><i class="fas fa-edit"></i> Edit</a>
+                            <a class="deleteform dropdown-item"><i class="fas fa-trash"></i> Delete</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div class="table-responsive">
                 <table class="table table-bordered table-striped table-hover dataTable js-exportable"
-                    id="ScheduleDatatable">
-                    <thead>
+                    id="ChronolgyDatatable">
+                    <thead class="bg-danger">
                         <tr>
                             <th></th>
-                            <th>Emp</th>
-                            <th>Full Name</th>
-                            <th>Date Work</th>
+                            <th>Employee Name</th>
+                            <th>Position</th>
                             <th>Shift</th>
-                            <th>WH</th>
                             <th>Activity</th>
-                            <th>Attendance</th>
+                            <th>Information</th>
+                            <th>Status</th>
                         </tr>
                     </thead>
-                    <tfoot>
-                        <tr>
-                            <th></th>
-                            <th>Emp</th>
-                            <th>Full Name</th>
-                            <th>Date Work</th>
-                            <th>Shift</th>
-                            <th>WH</th>
-                            <th>Activity</th>
-                            <th>Attendance</t>
-                        </tr>
-                    </tfoot>
                 </table>
             </div>
 
             <!-- Create Table -->
-            <div class="modal fade" id="ajaxModel" aria-hidden="true">
+            <div class="modal fade" id="chronologymodal" aria-hidden="true">
                 <div class="modal-dialog">
                     <div class="modal-content">
                         <div class="modal-header">
@@ -155,15 +164,6 @@
                                         <th>Action</th>
                                     </tr>
                                 </thead>
-                                <tfoot>
-                                    <tr>
-                                        <th>Code Shift</th>
-                                        <th>Start Shift</th>
-                                        <th>End Shift</th>
-                                        <th>Working Hour</th>
-                                        <th>Action</th>
-                                    </tr>
-                                </tfoot>
                             </table>
                         </div>
                     </div>
@@ -184,97 +184,128 @@
 
 @section('javascript')
 <!-- page script -->
+@endsection
+
+@push('scripts')
+@error('status')
+<script>
+    $('#modalchronolgy').modal('show');
+</script>
+@enderror
 <script>
     $(".preloader").fadeOut("slow");
     function format ( d ) {
         // `d` is the original data object for the row
-        return '<table cellpadding="5" cellspacing="0" border="0" style="padding-left:50px;">'+
-            '<tr>'+
-                '<td>Full name:</td>'+
-                '<td>'+d.FullName+'</td>'+
+        return '<table  class="table-sm bg-danger">'+
+            '<Thead>'+
+            '<tr align="center" valign="center">'+
+                '<th>Employee Name</th>'+
+                '<th>In</th>'+
+                '<th>Break</th>'+
+                '<th>Back</th>'+
+                '<th>Out</th>'+
+                '<th>Action</th>'+
             '</tr>'+
+            '<Thead>'+
             '<tr>'+
-                '<td>Extension number:</td>'+
-                '<td>'+d.FullName+'</td>'+
-            '</tr>'+
-            '<tr>'+
-                '<td>Extra info:</td>'+
-                '<td>And any further details here (images etc)...</td>'+
+                '<td>'+d.cashier.fullname+'</td>'+
+                '<td>14:00 in Reguler(19)</td>'+
+                '<td>17:00 in Reguler(19)</td>'+
+                '<td>18:00 in Reguler(21)</td>'+
+                '<td>22:00 in Reguler(21)</td>'+
+                '<td><button type="button" class="editchronology btn btn-secondary" id="'+d.id+'"><i class="fas fa-edit"></i> Edit</button></td>'+
             '</tr>'+
         '</table>';
     }
+function  toastchronology(){
+    $(document).Toasts('create', {
+        class: 'bg-secondary',
+        position: 'topLeft',
+        title: 'Chronology',
+        autohide: true,
+        delay: 2000,
+        body: 'Please enter a Counter in Activity Table .',
+        subtitle: 'validate',
+        icon: 'fas fa-envelope fa-calendar-alt'
+    })
+}
     $(document).ready(function() {
-            var table = $('#ScheduleDatatable').DataTable({
-            processing: true,
-            serverSide: true,
-            ajax: {
-            url:"{{ route('schedule.index') }}",
+        $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
+            });
+
+        var arrayerror = ['tidedc','midedc','serialnumber','ipaddress','counter_id','connection','simcard','type','status'];
+
+        var table = $('#ChronolgyDatatable').DataTable({
+        processing: true,
+        serverSide: true,
+        ajax: {url:"{{ route('chronology.datatable') }}",},
+        columns: [
+            {
+            "className":      'details-control',
+            "orderable":      false,
+            "searchable":     false,
+            "data":           null,
+            "defaultContent": ''
             },
-            "order": [[ 2, "asc" ]],
-            columns: [
-                {
-                "className":      'details-control',
-                "orderable":      false,
-                "searchable":     false,
-                "data":           null,
-                "defaultContent": ''
-                },
-                { data: 'Employee', name: 'Employee' },
-                { data: 'FullName', name: 'FullName' },
-                { data: 'Date', name: 'Date' },
-                { data: 'shift', name: 'shift' },
-                { data: 'WorkingHour', name: 'WorkingHour' },
-                { data: 'activity', name: 'activity', orderable: false},
-                { data: 'attendance', name: 'attendance', orderable: false}
-            ],
-            dom: 'Bfrtip',
+            { data: 'EmployeeName', name: 'EmployeeName' },
+            { data: 'cashier.position', name: 'cashier.position' },
+            { data: 'time', name: 'time' },
+            { data: 'activity', name: 'activity', orderable: false},
+            { data: 'information', name: 'information', orderable: false},
+            { data: 'action', name: 'action', orderable: false}
+        ],
+        responsive: true,
+        order: [[ 3, "asc" ]],
+        dom: 'Bfrtip',
         lengthMenu: [
-            [ 10, 25, 50, -1 ],
-            [ '10 rows', '25 rows', '50 rows', 'Show all' ]
+        [ 10, 25, 50, -1 ],
+        [ '10 rows', '25 rows', '50 rows', 'Show all' ]
         ],
         buttons:['pageLength',
-                    
-                    {
-                        extend: 'collection',
-                        text: 'Export',
-                        className: 'btn btn-info',
-                        buttons:[ 'copy', 'csv', 'excel', 'pdf', 'print',
-                                    {
-                                        collectionTitle: 'Visibility control',
-                                        extend: 'colvis',
-                                        collectionLayout: 'two-column'
-                                    }
-                                ]
-                    },
-                    {
-                        text: '<i class="fas fa-plus"></i><span> Picasso</span>',
-                        className: 'btn btn-success',
-                        action: function ( e, dt, node, config ) {
-                            $('#schedulesave').val("create-Picasso");
-                            $('#schedulesave').html('Save');
-                            $('#scheduleid').val('');
-                            $('#scheduleform').trigger("reset");
-                            $('#modelHeading').html("Create New Picasso ");
-                            $('#modalpicasso').modal('show');
-                        }
-                    },
-                    {
-                        text: '<i class="fas fa-calendar"></i><span> Code Shift</span>',
-                        className: 'btn btn-info',
-                        action: function ( e, dt, node, config ) {
-                            $('#schedulesave').val("create-schedule");
-                            $('#schedulesave').html('Save');
-                            $('#scheduleid').val('');
-                            $('#scheduleform').trigger("reset");
-                            $('#modalheadingcodeshift').html("Daftar Shift Schedule");
-                            $('#modalcodeshift').modal('show');
-                        }
-                }
-                ]
+                {
+                    collectionTitle: 'Visibility control',
+                    extend: 'colvis',
+                    collectionLayout: 'two-column'
+                },
+                {
+                    extend: 'collection',
+                    text: 'Export',
+                    className: 'btn btn-secondary',
+                    buttons:[ 'copy', 'csv', 'excel', 'pdf', 'print']
+                },
+                {
+                    text: '<i class="fas fa-plus"></i><span> Picasso</span>',
+                    className: 'btn btn-secondary',
+                    action: function ( e, dt, node, config ) {
+                        $('#schedulesave').val("create-Picasso");
+                        $('#schedulesave').html('Save');
+                        $('#scheduleid').val('');
+                        $('#scheduleform').trigger("reset");
+                        $('#modelHeading').html("Create New Picasso ");
+                        $('#modalpicasso').modal('show');
+                    }
+                },
+                {
+                    text: '<i class="fas fa-calendar"></i><span> Code Shift</span>',
+                    className: 'btn btn-secondary',
+                    action: function ( e, dt, node, config ) {
+                        $('#schedulesave').val("create-schedule");
+                        $('#schedulesave').html('Save');
+                        $('#scheduleid').val('');
+                        $('#scheduleform').trigger("reset");
+                        $('#modalheadingcodeshift').html("Daftar Shift Schedule");
+                        $('#modalcodeshift').modal('show');
+                    }
+            }
+            ]
         });
 
+
          // Add event listener for opening and closing details
-         $('#ScheduleDatatable').on('click', 'td.details-control', function () {
+        $('#ChronolgyDatatable').on('click', 'td.details-control', function () {
             var tr = $(this).closest('tr');
             var row = table.row( tr );
 
@@ -290,31 +321,72 @@
             }
         });
 
-        $('.datepicker').datepicker({
-            format: 'dddd DD MMMM YYYY',
-            clearButton: true,
-            weekStart: 1,
-            time: false
+        $(document).on('click', '.statusbutton', function () {
+            var scheduleid = $(this).attr('id');
+            var status = $(this).attr('status');
+            //var id =  $('#chronologyid'+scheduleid).val();
+            var id;
+            var counterid =  $('#chronologyselect'+scheduleid).val();
+            var workingtime = new Date().toLocaleTimeString();
+            var information =  $('#info'+scheduleid).val();
+            if (!counterid) {
+                toastchronology()
+            } else {
+                swal.fire({
+                title: "Are you sure?",
+                text: "You will fill attendance this Employee!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes, save!",
+                cancelButtonText: "No, cancel!"
+                }).then((result) => {
+                    if (result.value) {
+                        formtag = {"id": id,"schedule_id": scheduleid,"counter_id": counterid,"status": status,"workingtime": workingtime,"information": information};
+                        $.ajax({
+                            data: formtag,
+                            url:"{{ route('chronology.store') }}",
+                            type: "POST",
+                            dataType: 'json',
+                            success:function(data){
+                            swal.fire("Success!",data["success"], "success")
+                            $('#ChronolgyDatatable').DataTable().ajax.reload();
+                            }
+                        });
+                    } else {
+                        swal.fire("Cancelled", "This employee has not filled in attendance", "error");
+                    }
+                });
+            }
         });
 
-        $(document).on('click', '.scheduleedit', function () {
+
+        $(document).on('click', '.editchronology', function () {
             var scheduleid = $(this).attr('id');
-            $.get("{{ route('schedule.index') }}" +'/' + scheduleid +'/edit', function (data)
-            {
-                $('#modelHeading').html("Edit Data Schedule");
-                $('#schedulesave').val("edit-schedule");
-                $('#schedulesave').html('Save Changes');
-                $('#ajaxModel').modal('show');
-                $('#scheduleid').val(data.id);
-                $('#emp').val(data.Employee);
-                $('#name').val(data.FullName);
-                $('#birth').val(data.DateOfBirth);
-                $('#address').val(data.Address);
-                $('#phone').val(data.PhoneNumber);
-                $('#position').val(data.Position);
-                $('#join').val(data.JoinDate);
-            })
+            swal.fire({
+                title: "Are you sure?",
+                text: "You will fill attendance this Employee!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes, save!",
+                cancelButtonText: "No, cancel!"
+            }).then((result) => {
+                if (result.value) {
+                    $.ajax({
+                url:"cashier/"+cashierid,
+                type: "PATCH",
+                success:function(data){
+                    createschedule();
+                    swal.fire("Success!", "This employee has filled in attendance.", "success")
+                }
+                });
+                } else {
+                    swal.fire("Cancelled", "This employee has not filled in attendance", "error");
+                }
+            });
         });
+
 
         $(document).on('click', '.showschedule', function () {
             var id = $(this).attr('id');
@@ -334,7 +406,7 @@
                 success: function (data) {
 
                     $('#scheduleform').trigger("reset");
-                    $('#ajaxModel').modal('hide');
+                    $('#chronologymodal').modal('hide');
                     $('#schedulesave').html('Save');
                     table.draw();
                 },
@@ -377,7 +449,7 @@
                 url:"schedule/destroy/"+schedule_id,
                 success:function(data){
                     swal("Deleted!", "Your Schedule file has been deleted.", "success")
-                    $('#ScheduleDatatable').DataTable().ajax.reload();
+                    $('#ChronolgyDatatable').DataTable().ajax.reload();
                 }
                 });
                 } else {
@@ -385,17 +457,26 @@
                 }
             });
         }
-        $('#datetimepicker1').datetimepicker({
-                    format: 'L'
-                });
-        $('#datetimepicker2').datetimepicker({
-                    format: 'LT'
-                });
-        $('#datetimepicker3').datetimepicker({
-                    format: 'LT'
-                });
-        $('[data-mask]').inputmask()
+
+
+        // $('#datetimepicker1').datetimepicker({
+        //             format: 'L'
+        //         });
+        // $('#datetimepicker2').datetimepicker({
+        //             format: 'LT'
+        //         });
+        // $('#datetimepicker3').datetimepicker({
+        //             format: 'LT'
+        //         });
+        // $('[data-mask]').inputmask()
+
+        // $('.datepicker').datepicker({
+        //     format: 'dddd DD MMMM YYYY',
+        //     clearButton: true,
+        //     weekStart: 1,
+        //     time: false
+        // });
 
     });
 </script>
-@endsection
+@endpush

@@ -15,14 +15,12 @@ class CreateActivitiesTable extends Migration
     {
         Schema::create('activities', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('cashier_id');
             $table->foreignId('schedule_id');
-            $table->foreignId('shift_id');
             $table->foreignId('counter_id');
-            $table->time('in');
-            $table->time('break');
-            $table->time('back');
-            $table->time('out');
+            $table->time('in')->nullable();
+            $table->time('break')->nullable();
+            $table->time('back')->nullable();
+            $table->time('out')->nullable();
             $table->string('author')->nullable();
             $table->timestamps();
             $table->softDeletes();
