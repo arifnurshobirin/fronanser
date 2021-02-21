@@ -13,7 +13,7 @@
     <!-- Default box -->
         <div class="card card-danger card-outline">
             <div class="card-header">
-                <h3 class="card-title"><i class="fas fa-desktop"></i> EDC DataTable</h3>
+                <h3 class="card-title"><i class="fas fa-fax"></i> EDC DataTable</h3>
                 <div class="card-tools">
                     <button type="button" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip"
                         title="Collapse">
@@ -45,15 +45,15 @@
                     </table>
                 </div>
 <!-- Create Table -->
-<div class="modal fade" id="edcmodal" data-backdrop="static"  aria-hidden="true">
+<div class="modal fade" id="modaledc" data-backdrop="static"  aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title" id="modelHeading"></h4>
-                <button type="button" class="btn btn-danger" id="resetmodal" data-dismiss="modal"><i class='fas fa-times'></i> Close</button>
+                <h4 class="modal-title" id="modalheading"></h4>
+                <button type="button" class="btn btn-secondary" id="resetmodal" data-dismiss="modal"><i class='fas fa-times'></i> Close</button>
             </div>
             <div class="modal-body">
-                <form method="post" id="edcForm" name="edcForm">
+                <form method="post" id="formedc" name="formedc">
                     {{-- action="/admin/edc/store" --}}
                     @csrf
                     <input type="hidden" name="id" id="edcid">
@@ -83,10 +83,18 @@
                         </div>
                         <div id="erroripaddress"></div>
                     </div>
+                    <label for="serialnumber">Serial Number</label>
+                    <div class="form-group">
+                        <div class="form-line">
+                            <input type="text" id="serialnumber" name="serialnumber" class="form-control" placeholder="Enter your Serial Number">
+                        </div>
+                        <div id="errorserialnumber"></div>
+                    </div>
                     <label for="no">No Counter</label>
                     <div class="form-group">
                         <div class="form-line">
                             <select class="custom-select" id="selectnocounter" name="counter_id">
+                                <option value="">-- Please select --</option>
                                 @foreach($datacounter as $counter)
                                 <option value="{{$counter->id}}">{{$counter->nocounter}}</option>
                                 @endforeach
@@ -126,6 +134,8 @@
                                 <option value="WireCard">WireCard</option>
                                 <option value="BCA">BCA</option>
                                 <option value="Spots">Spots</option>
+                                <option value="Mandiri">Mandiri</option>
+                                <option value="CIMBNiaga">CIMBNiaga</option>
                             </select>
                         </div>
                         <div id="errortype"></div>
@@ -168,12 +178,11 @@
 @push('scripts')
 @error('status')
 <script>
-    $('#edcmodal').modal('show');
+    $('#modaledc').modal('show');
 </script>
 @enderror
 <script>
     $(".preloader").fadeOut("slow");
-
     function format ( d ) {
         // `d` is the original data object for the row
         return '<table cellpadding="5" cellspacing="0" border="0" style="padding-left:50px;">'+
@@ -189,6 +198,10 @@
                 '<td>IP Address:</td>'+
                 '<td>'+d.ipaddress+'</td>'+
             '</tr>'+
+            '<tr>'+
+                '<td>Serial Number:</td>'+
+                '<td>'+d.serialnumber+'</td>'+
+            '</tr>'+
         '</table>';
     }
     $(document).ready(function() {
@@ -198,14 +211,12 @@
                 }
             });
 
-        var arrayerror = ['tidedc','midedc','ipaddress','counter_id','connection','simcard','type','status'];
+        var arrayerror = ['tidedc','midedc','serialnumber','ipaddress','counter_id','connection','simcard','type','status'];
 
         var table = $('#EDCDatatable').DataTable({
             processing: true,
             serverSide: true,
-            ajax: {
-            url:"{{ route('edc.datatable') }}",
-            },
+            ajax: {url:"{{ route('edc.datatable') }}"},
             responsive: true,
             columns: [
                 { data: 'checkbox', name: 'checkbox', orderable:false, searchable: false},
@@ -223,7 +234,7 @@
                 { data: 'status', name: 'status' },
                 { data: 'action', name: 'action', orderable: false,searchable: false}
             ],
-            order: [[ 2, "asc" ]],
+            order: [[ 3, "asc" ]],
             dom: 'Bfrtip',
         lengthMenu: [
             [ 10, 25, 50, -1 ],
@@ -245,16 +256,16 @@
                         text: '<i class="fas fa-plus"></i><span> Add EDC</span>',
                         className: 'btn btn-secondary',
                         action: function ( e, dt, node, config ) {
-                            for( a=0;a<8;a++)
+                            for( a=0;a<arrayerror.length;a++)
                             {
                                 $('#error'+arrayerror[a]).html('');
                             }
                             $('#savebutton').val("create-edc");
                             $('#savebutton').html('Save');
                             $('#edcid').val('');
-                            $('#edcForm').trigger("reset");
-                            $('#modelHeading').html("Create New EDC");
-                            $('#edcmodal').modal('show');
+                            $('#formedc').trigger("reset");
+                            $('#modalheading').html("Create New EDC");
+                            $('#modaledc').modal('show');
                         }
                     }
                 ]
@@ -281,22 +292,23 @@
             var edcid = $(this).attr('id');
             $.get("{{ route('edc.index') }}" +'/' + edcid +'/edit', function (data)
             {
-                for( a=0;a<8;a++)
+                for( a=0;a<arrayerror.length;a++)
                     {
                         $('#error'+arrayerror[a]).html('');
                     }
-                $('#modelHeading').html("Edit Data EDC");
+                $('#modalheading').html("Edit Data EDC");
                 $('#savebutton').html('Save Changes');
-                $('#edcmodal').modal('show');
+                $('#modaledc').modal('show');
                 $('#edcid').val(data.id);
                 $('#tidedc').val(data.tidedc);
                 $('#midedc').val(data.midedc);
                 $('#ipaddress').val(data.ipaddress);
-                $('#selectnocounter').val(data.nocounter);
+                $('#serialnumber').val(data.serialnumber);
                 $('#connection').val(data.connection);
                 $('#simcard').val(data.simcard);
                 $('#typeedc').val(data.type);
                 $('#statusedc').val(data.status);
+                $('#selectnocounter').val(data.counter_id);
             })
         });
 
@@ -309,14 +321,13 @@
             e.preventDefault();
             $(this).html('Sending..');
             $.ajax({
-                data: $('#edcForm').serialize(),
+                data: $('#formedc').serialize(),
                 url: "{{ route('edc.store') }}",
                 type: "POST",
                 dataType: 'json',
                 success: function (data) {
-
-                    $('#edcForm').trigger("reset");
-                    $('#edcmodal').modal('hide');
+                    $('#formedc').trigger("reset");
+                    $('#modaledc').modal('hide');
                     $('#savebutton').html('Save');
                     table.draw();
                     swal.fire("Good job!", "You success update EDC!", "success");
@@ -324,7 +335,7 @@
                 error: function (data) {
                     console.log('Error:', data);
                     $('#savebutton').html('Save Changes');
-                    for( a=0;a<8;a++)
+                    for( a=0;a<arrayerror.length;a++)
                     {
                         $('#error'+arrayerror[a]).html('');
                     }
@@ -399,6 +410,5 @@
             });
 
     });
-
 </script>
 @endpush

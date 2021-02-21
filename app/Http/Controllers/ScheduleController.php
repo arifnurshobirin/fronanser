@@ -151,6 +151,7 @@ class ScheduleController extends Controller
     {
         $arraycode = ['codemonday','codetuesday','codewednesday','codethursday','codefriday','codesaturday','codesunday'];
         $arrayid = ['idmonday','idtuesday','idwednesday','idthursday','idfriday','idsaturday','idsunday'];
+        $datadate= [];
         $dataweek = $request->weekinput;
         $startdate = Carbon::parse($request->dateinput);
         $positiontable = explode(',', $request->positionhidden);
@@ -161,12 +162,14 @@ class ScheduleController extends Controller
             {
                 if($c==0){
                     $dateformat =  $startdate->isoFormat('YYYY-MM-DD');
-                    $dateschedule = Carbon::parse($dateformat);
+                    $date = Carbon::parse($dateformat);
+                    array_push($datadate,$date);
                 }
                 else{
                     $dateadd =  $startdate->addDays(1);
                     $dateformat = $dateadd->isoFormat('YYYY-MM-DD');
-                    $dateschedule = Carbon::parse($dateformat);
+                    $date = Carbon::parse($dateformat);
+                    array_push($datadate,$date);
                 }
 
                 $code = $arraycode[$c] .$b;
@@ -182,7 +185,7 @@ class ScheduleController extends Controller
                         'cashier_id' => $datacashier[$b],
                         'shift_id' => $datashift[0],
                         'week' =>  $dataweek,
-                        'date' => $dateschedule,
+                        'date' => $datadate[$c],
                     );
                     Schedule::updateOrCreate(['id'=>$dataid],$attr);
                 }

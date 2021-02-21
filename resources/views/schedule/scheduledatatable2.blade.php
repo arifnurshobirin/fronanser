@@ -94,13 +94,21 @@
                         <div class="col-md-4 text-right">
                             <button type="button" name="backschedule" id="backschedule" class="btn btn-secondary"><i class="fas fa-hand-point-left"></i> Back</button>
                             <button type="button" name="nextschedule" id="nextschedule" class="btn btn-secondary">Next <i class="fas fa-hand-point-right"></i></button>
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown"><i class="fas fa-desktop"></i> Show</button>
+                                <div class="dropdown-menu dropdown-menu-right" role="menu">
+                                    <a class="createform dropdown-item" onclick="lockschedule()"><i class="fas fa-desktop"></i> Lock</a>
+                                    <a class="editform dropdown-item"  onclick="editschedule()"><i class="fas fa-edit"></i> Edit</a>
+                                    <a class="deleteform dropdown-item"><i class="fas fa-trash"></i> Delete</a>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="table-responsive">
-                        <table class="table table-bordered table-striped table-hover"
+                        <table class="table table-sm table-bordered table-striped table-hover"
                             id="ScheduleDatatable" style="width:100%">
                             <thead class="bg-danger">
-                                <tr>
+                                <tr align="center" valign="center">
                                     <th>Employee Name</th>
                                     {{-- <th>Status</th> --}}
                                     <th name="day1" id="day1" class="">Monday</th>
@@ -265,6 +273,22 @@ function  showschedule(){
     }
 }
 
+function  saveschedule(list){
+    $.ajax({
+        data: formtag,
+        url: "{{ route('schedule.store') }}",
+        type: "POST",
+        dataType: 'json',
+        success:function(data){
+        swal.fire("Good job!",data["success"], "success")
+        },
+        error: function (data) {
+            console.log('Errornya adalah:', data);
+            $('#savebutton').html('Save Changes');
+        }
+    });
+}
+
 
 function createschedule(){
     document.getElementById("schedulebox").removeAttribute("style");
@@ -340,14 +364,7 @@ function createschedule(){
                 "<h6 id='hoursunday"+list+"' name='hoursunday"+list+"' align='center'></h6><input type='hidden' name='idsunday"+list+"' id='idsunday"+list+"'></td>"+
 
                 "<td><h6 id='workinghour"+list+"' name='workinghour"+list+"' align='center'></h6></td>"+
-                "<td><div class='btn-group'>"+
-                        "<button type='button' class='btn btn-secondary dropdown-toggle' data-toggle='dropdown'><i class='fas fa-wrench'></i> </button>"+
-                        "<div class='dropdown-menu dropdown-menu-right' role='menu'>"+
-                            "<a class='createform dropdown-item' id="+list+" onclick='lockschedule("+list+")'><i class='fas fa-desktop'></i> Lock</a>"+
-                            "<a class='editform dropdown-item' id="+list+"  onclick='editschedule("+list+")'><i class='fas fa-edit'></i> Edit</a>"+
-                            "<a class='deleteform dropdown-item' id="+list+"><i class='fas fa-trash'></i> Delete</a>"+
-                        "</div>"+
-                    "</div>"+
+                "<td><a class='editform' id="+list+"  onclick='editschedule("+list+")'><i class='fas fa-edit'></i> Edit</a>"+
                 "</td></tr>");
             })
             data.dataschedule.forEach(function(schedule, list){
@@ -479,36 +496,26 @@ function createschedule(){
             }).then((result) => {
                 if (result.value) {
                     lockschedule();
-                    var cellschedule= $('.input-uppercase').length;
-                    console.log(cellschedule);
-                    // for (k=0;k<cellschedule;k++)
-                    //     {
-                            if ($('.input-uppercase').hasClass('is-invalid')|| $('.input-uppercase').hasClass('is-warning'))
-                            {
-                                swal.fire("Cancelled", "Please check Your Schedule", "error");
-                            } else {
-                                $.ajax({
-                                    data: $('#scheduleform').serialize(),
-                                    url: "{{ route('schedule.store') }}",
-                                    type: "POST",
-                                    dataType: 'json',
-                                    success:function(data){
-                                    swal.fire("Good job!",data["success"], "success")
-                                    },
-                                    error: function (data) {
-                                        console.log('Errornya adalah:', data);
-                                        $('#savebutton').html('Save Changes');
-                                        for( a=0;a<8;a++)
-                                        {
-                                            $('#error'+arrayerror[a]).html('');
-                                        }
-                                        $.each(data.responseJSON.errors, function(key,value) {
-                                            $('#error'+key).append('<div class="text-danger mt-2">'+value+'</div');
-                                        });
-                                    }
-                                });
+                    cellschedule= $('.input-uppercase').length;
+                    formtag = $('#scheduleform').serialize();
+                    if ($('.input-uppercase').hasClass('is-invalid')|| $('.input-uppercase').hasClass('is-warning'))
+                    {
+                        swal.fire("Cancelled", "Please check Your Schedule", "error");
+                    } else {
+                        $.ajax({
+                            data: formtag,
+                            url: "{{ route('schedule.store') }}",
+                            type: "POST",
+                            dataType: 'json',
+                            success:function(data){
+                            swal.fire("Good job!",data["success"], "success")
+                            },
+                            error: function (data) {
+                                console.log('Errornya adalah:', data);
+                                $('#savebutton').html('Save Changes');
                             }
-                        // }
+                        });
+                    }
                 } else {
                     swal.fire("Cancelled", "Your Schedule  status have not save :)", "error");
                 }

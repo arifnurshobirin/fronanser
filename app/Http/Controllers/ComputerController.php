@@ -66,16 +66,32 @@ class ComputerController extends Controller
      */
     public function store(Request $request)
     {
-        $attr=$request->validate([
-            'nocomputer' => 'required|unique:computers',
-            'counter_id' => 'required',
-            'printer' => 'required',
-            'drawer' => 'required',
-            'scanner' => 'required',
-            'monitor' => 'required',
-            'type' => 'required',
-            'status' => 'required'
-        ]);
+        $idcomputer = $request->id;
+        if (!$idcomputer) {
+            $attr=$request->validate([
+                'nocomputer' => 'required|unique:computers',
+                'counter_id' => 'required',
+                'printer' => 'required',
+                'drawer' => 'required',
+                'scanner' => 'required',
+                'monitor' => 'required',
+                'type' => 'required',
+                'status' => 'required'
+            ]);
+        }
+        else {
+            $attr=$request->validate([
+                'nocomputer' => 'required',
+                'counter_id' => 'required',
+                'printer' => 'required',
+                'drawer' => 'required',
+                'scanner' => 'required',
+                'monitor' => 'required',
+                'type' => 'required',
+                'status' => 'required'
+            ]);
+        }
+
         Computer::updateOrCreate(['id'=>$request->id],$attr);
         return response()->json(['success' => 'Data Added successfully.']);
 
@@ -123,7 +139,7 @@ class ComputerController extends Controller
      * @param  \App\Computer  $computer
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Computer $computer,$id)
+    public function destroy($id)
     {
         $data = Computer::findOrFail($id);
         $data->delete();

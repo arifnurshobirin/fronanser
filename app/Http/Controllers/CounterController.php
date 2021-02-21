@@ -65,18 +65,28 @@ class CounterController extends Controller
     public function store(Request $request)
     {
 
-        var_dump($request->nocounter);
-        // $form_data = array(
-        //     'nocounter' => $request->nocounter,
-        //     'ipaddress' => $request->ipaddress,
-        //     'macaddress' => $request->macaddress,
-        //     'type' => $request->typecounter,
-        //     'status' => $request->statuscounter
-        // );
+        $idcounter = $request->id;
+        if (!$idcounter) {
+            $datacounter=$request->validate([
+                'nocounter' => 'required|max:3',
+                'ipaddress' => 'required|unique:counters',
+                'macaddress' => 'required|unique:counters',
+                'type' => 'required',
+                'status' => 'required'
+            ]);
+        }
+        else {
+            $datacounter=$request->validate([
+                'nocounter' => 'required|max:3',
+                'ipaddress' => 'required',
+                'macaddress' => 'required',
+                'type' => 'required',
+                'status' => 'required'
+            ]);
 
-        // Counter::updateOrCreate(['id'=>$request->counterid],$form_data);
-
-        // return response()->json(['success' => 'Data Added successfully.']);
+        }
+        Counter::updateOrCreate(['id'=>$request->id],$datacounter);
+        return response()->json(['success' => 'Data Added successfully.']);
     }
 
     /**

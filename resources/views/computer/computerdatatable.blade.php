@@ -29,7 +29,7 @@
                 <table class="table table-bordered table-striped table-hover dataTable js-exportable" id="ComputerDatatable" style="width:100%">
                     <thead class="bg-danger">
                         <tr>
-                            <th><button type="button" name="computermoredelete" id="computermoredelete" class="btn btn-danger btn-sm">
+                            <th><button type="button" name="computermoredelete" id="computermoredelete" class="btn btn-secondary btn-sm">
                                     <i class="fas fa-times"></i><span></span>
                                 </button></th>
                             <th></th>
@@ -48,13 +48,13 @@
                 <div class="modal-dialog">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h4 class="modal-title" id="modelHeading">Create Computer</h4>
+                            <h4 class="modal-title" id="modelHeading"></h4>
                             <button type="button" class="btn btn-secondary" id="resetmodal" data-dismiss="modal"><i class='fas fa-times'></i> Close</button>
                         </div>
                         <div class="modal-body">
-                            <form method="post" id="computerform" name="computerform">
+                            <form method="post" id="formcomputer" name="formcomputer">
                                 @csrf
-                                <input type="hidden" name="computerid" id="computerid">
+                                <input type="hidden" name="id" id="computerid">
                                 <label for="nocomputer">No Computer</label>
                                 <div class="form-group">
                                     <div class="form-line">
@@ -67,6 +67,7 @@
                                 <div class="form-group">
                                     <div class="form-line">
                                         <select class="custom-select" id="selectnocounter" name="counter_id">
+                                            <option value="">-- Please select --</option>
                                             @foreach($datacounter as $counter)
                                             <option value="{{$counter->id}}">{{$counter->nocounter}}</option>
                                             @endforeach
@@ -157,7 +158,7 @@
                                     </div>
                                     <div id="errorstatus"></div>
                                 </div>
-                                <button type="submit" class="btn btn-primary m-t-15 waves-effect" id="computersave"
+                                <button type="button" class="btn btn-primary m-t-15" id="computersave"
                                     value="create">Save</button>
                             </form>
                         </div>
@@ -267,7 +268,7 @@
                             $('#computersave').val("create Computer");
                             $('#computersave').html('Save');
                             $('#computerid').val('');
-                            $('#computerform').trigger("reset");
+                            $('#formcomputer').trigger("reset");
                             $('#modelHeading').html("Create New Computer");
                             $('#computermodal').modal('show');
                         }
@@ -303,13 +304,13 @@
             e.preventDefault();
             $(this).html('Sending..');
             $.ajax({
-                data: $('#computerform').serialize(),
+                data: $('#formcomputer').serialize(),
                 url: "{{ route('computer.store') }}",
                 type: "POST",
                 dataType: 'json',
                 success: function (data) {
 
-                    $('#computerform').trigger("reset");
+                    $('#formcomputer').trigger("reset");
                     $('#computermodal').modal('hide');
                     $('#computersave').html('Save');
                     table.draw();
@@ -318,7 +319,7 @@
                 error: function (data) {
                     console.log('Error:', data);
                     $('#computersave').html('Save Changes');
-                    for( a=0;a<8;a++)
+                    for( a=0;a<arrayerror.length;a++)
                     {
                         $('#error'+arrayerror[a]).html('');
                     }
@@ -333,7 +334,7 @@
             var computerid = $(this).attr('id');
             $.get("{{ route('computer.index') }}" +'/' + computerid +'/edit', function (data)
             {
-                for( a=0;a<8;a++)
+                for( a=0;a<arrayerror.length;a++)
                     {
                         $('#error'+arrayerror[a]).html('');
                     }
@@ -343,7 +344,7 @@
                 $('#computermodal').modal('show');
                 $('#computerid').val(data.id);
                 $('#nocomputer').val(data.nocomputer);
-                $('#selectnocounter').val(data.nocounter);
+                $('#selectnocounter').val(data.counter_id);
                 $('#type').val(data.type);
                 $('#printer').val(data.printer);
                 $('#drawer').val(data.drawer);

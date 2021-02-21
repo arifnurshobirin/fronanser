@@ -7,7 +7,7 @@ use DataTables;
 use App\DataTables\EdcsDataTable;
 use Illuminate\Http\Request;
 use Validator;
-    Use Alert;
+Use Alert;
 
 class EdcController extends Controller
 {
@@ -74,17 +74,38 @@ class EdcController extends Controller
      */
     public function store(Request $request)
     {
-        $attr=$request->validate([
-            'tidedc' => 'required|min:5',
-            'midedc' => 'required|string',
-            'ipaddress' => 'required|unique:edcs',
-            'counter_id' => 'required',
-            'connection' => 'required',
-            'simcard' => 'required',
-            'type' => 'required',
-            'status' => 'required'
-        ]);
-        Edc::updateOrCreate(['id'=>$request->id],$attr);
+        //dd($request);
+        $idedc = $request->id;
+        if (!$idedc) {
+            $dataedc=$request->validate([
+                'tidedc' => 'required|min:5',
+                'midedc' => 'required|string',
+                'ipaddress' => 'required|unique:edcs',
+                'serialnumber' => 'required|unique:edcs',
+                'counter_id' => 'required',
+                'connection' => 'required',
+                'simcard' => 'required',
+                'type' => 'required',
+                'status' => 'required'
+            ]);
+        }
+        else {
+            $dataedc=$request->validate([
+                'tidedc' => 'required|min:5',
+                'midedc' => 'required|string',
+                'ipaddress' => 'required',
+                'serialnumber' => 'required',
+                'counter_id' => 'required',
+                'connection' => 'required',
+                'simcard' => 'required',
+                'type' => 'required',
+                'status' => 'required'
+            ]);
+        }
+
+        dd($dataedc);
+        Edc::updateOrCreate(['id'=>$request->id],$dataedc);
+        return response()->json(['success' => 'Data Added successfully.']);
 
         // if ($attr->fails()) {
         //     return Redirect::back()->with('error_code', 5);
@@ -93,7 +114,7 @@ class EdcController extends Controller
         // }
 
         // return back()->with('success', 'Success Message');
-        return response()->json(['success' => 'Data Added successfully.']);
+
 
     }
 

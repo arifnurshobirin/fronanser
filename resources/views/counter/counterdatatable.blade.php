@@ -67,15 +67,15 @@
                             <button type="button" class="btn btn-secondary" id="resetmodal" data-dismiss="modal"><i class='fas fa-times'></i> Close</button>
                         </div>
                         <div class="modal-body">
-                            <form method="post" id="counterform" name="counterform">
+                            <form method="post" id="formcounter" name="formcounter">
                                 @csrf
-                                <input type="hidden" name="counterid" id="counterid">
+                                <input type="hidden" name="id" id="counterid">
                                 <label for="nopos">No Counter</label>
                                 <div class="form-group">
                                     <div class="form-line">
-                                        <input type="number" id="nocounter" name="nocounter" class="form-control"
-                                            placeholder="Enter your No Counter" required>
+                                        <input type="number" id="nocounter" name="nocounter" class="form-control" placeholder="Enter your No Counter">
                                     </div>
+                                    <div id="errornocounter"></div>
                                 </div>
                                 <label for="ip">Ip Address</label>
                                 <div class="form-group">
@@ -83,6 +83,7 @@
                                         <input type="text" class="form-control ip" id="ipaddress" name="ipaddress"
                                             placeholder="Enter your Ip Address">
                                     </div>
+                                    <div id="erroripaddress"></div>
                                 </div>
                                 <label for="mac">Mac Address</label>
                                 <div class="form-group">
@@ -90,11 +91,12 @@
                                         <input type="text" class="form-control" id="macaddress" name="macaddress"
                                             placeholder="Enter your Mac Address">
                                     </div>
+                                    <div id="errormacaddress"></div>
                                 </div>
                                 <label for="type">Type Counter</label>
                                 <div class="form-group">
                                     <div class="form-line">
-                                        <select class="custom-select" id="typecounter" name="typecounter">
+                                        <select class="custom-select" id="type" name="type">
                                             <option value="">-- Please select --</option>
                                             <option value="Regular">Regular</option>
                                             <option value="SaladBar">SaladBar</option>
@@ -113,12 +115,13 @@
                                             <option value="Backup">Backup</option>
                                         </select>
                                     </div>
+                                    <div id="errortype"></div>
                                 </div>
 
                                 <label for="type">Status Counter</label>
                                 <div class="form-group">
                                     <div class="form-line">
-                                        <select class="custom-select" id="statuscounter" name="statuscounter">
+                                        <select class="custom-select" id="status" name="status">
                                             <option value="">-- Please select --</option>
                                             <option value="Queueing">Queueing</option>
                                             <option value="Active">Active</option>
@@ -126,10 +129,10 @@
                                             <option value="Broken">Broken</option>
                                         </select>
                                     </div>
+                                    <div id="errorstatus"></div>
                                 </div>
 
-                                <button type="submit" class="btn btn-primary m-t-15 waves-effect" id="countersave"
-                                    value="create">Save</button>
+                                <button type="button" class="btn btn-primary" id="savebutton" value="create">Save</button>
                             </form>
                         </div>
                     </div>
@@ -149,6 +152,14 @@
 
 @section('javascript')
 <!-- page script -->
+@endsection
+
+@push('scripts')
+@error('status')
+<script>
+    $('#countermodal').modal('show');
+</script>
+@enderror
 <script>
     $(".preloader").fadeOut("slow");
     function format ( d ) {
@@ -175,6 +186,7 @@
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 }
             });
+            var arrayerror = ['nocounter','ipaddress','macaddress','type','status'];
 
         var table = $('#CounterDatatable').DataTable({
         processing: true,
@@ -205,27 +217,29 @@
             [ '10 rows', '25 rows', '50 rows', 'Show all' ]
         ],
         buttons:['pageLength',
-
+                        {
+                        collectionTitle: 'Visibility control',
+                        extend: 'colvis',
+                        collectionLayout: 'two-column'
+                        },
                         {
                             extend: 'collection',
                             text: 'Export',
-                            className: 'btn btn-info',
-                            buttons:[ 'copy', 'csv', 'excel', 'pdf', 'print',
-                                        {
-                                            collectionTitle: 'Visibility control',
-                                            extend: 'colvis',
-                                            collectionLayout: 'two-column'
-                                        }
-                                    ]
+                            className: 'btn btn-secondary',
+                            buttons:[ 'copy', 'csv', 'excel', 'pdf', 'print']
                         },
                         {
                             text: '<i class="fas fa-plus"></i><span> Add Counter</span>',
-                            className: 'btn btn-success',
+                            className: 'btn btn-secondary',
                             action: function ( e, dt, node, config ) {
+                                for( a=0;a<arrayerror.length;a++)
+                            {
+                                $('#error'+arrayerror[a]).html('');
+                            }
                                 $('#countersave').val("create Counter");
                                 $('#countersave').html('Save');
                                 $('#counterid').val('');
-                                $('#counterform').trigger("reset");
+                                $('#formcounter').trigger("reset");
                                 $('#modelHeading').html("Create New Counter");
                                 $('#countermodal').modal('show');
                             }
@@ -250,28 +264,32 @@
             }
         });
 
-        $('#counterform').on("submit",function (event) {
-            event.preventDefault();
-            $('#countersave').html('Sending..');
-            var formdata = new FormData($(this)[0]);
-            // console.log(formdata);
+        $('#savebutton').click(function (e) {
+            e.preventDefault();
+            $(this).html('Sending..');
             $.ajax({
+                data: $('#formcounter').serialize(),
                 url: "{{ route('counter.store') }}",
                 type: "POST",
-                data: formdata,
-                processData: false,
-                contentType: false,
+                dataType: 'json',
                 success: function (data) {
 
-                    $('#counterform').trigger("reset");
+                    $('#formcounter').trigger("reset");
                     $('#countermodal').modal('hide');
                     $('#possave').html('Save');
                     table.draw();
                     swal.fire("Good job!", "You success update Counter!", "success");
                 },
                 error: function (data) {
-                    console.log('Error:', data);
-                    alert('Status: ' + data);
+                    console.log('Error nya apa:', data);
+                    $('#savebutton').html('Save Changes');
+                    for( a=0;a<arrayerror.length;a++)
+                    {
+                        $('#error'+arrayerror[a]).html('');
+                    }
+                    $.each(data.responseJSON.errors, function(key,value) {
+                        $('#error'+key).append('<div class="text-danger mt-2">'+value+'</div');
+                    });
                 }
             });
         });
@@ -283,13 +301,13 @@
                 $('#modelHeading').html("Edit Data Counter");
                 $('#countersave').val("edit-counter");
                 $('#countersave').html('Save Changes');
-                $('#ajaxModel').modal('show');
+                $('#countermodal').modal('show');
                 $('#counterid').val(data.id);
                 $('#nocounter').val(data.nocounter);
                 $('#ipaddress').val(data.ipaddress);
                 $('#macaddress').val(data.macaddress);
                 $('#typecounter').val(data.type);
-                $('#statuscounter').val(data.status);
+                $('#status').val(data.status);
             })
         });
 
@@ -361,4 +379,4 @@
 
     });
 </script>
-@endsection
+@endpush

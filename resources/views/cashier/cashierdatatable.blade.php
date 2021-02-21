@@ -5,7 +5,10 @@
 
 @section('css')
 <!-- Tempusdominus Bbootstrap 4 -->
-<link href="{{ asset('plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css') }}" rel="stylesheet">
+<link href="{{ asset('dashboard/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css') }}" rel="stylesheet">
+<!-- datepicker jquery -->
+<link href="{{ asset('dashboard/plugins/jquery-ui/jquery-ui.min.css') }}" rel="stylesheet">
+<link href="{{ asset('dashboard/plugins/jquery-ui/jquery-ui.theme.min.css') }}" rel="stylesheet">
 <!-- Page CSS -->
 @endsection
 
@@ -45,7 +48,7 @@
                             <th>Action</th>
                         </tr>
                     </thead>
-                    <tfoot class="bg-danger">
+                    {{-- <tfoot class="bg-danger">
                         <tr>
                             <th></th>
                             <th></th>
@@ -56,36 +59,46 @@
                             <th>Status</th>
                             <th>Action</th>
                         </tr>
-                    </tfoot>
+                    </tfoot> --}}
                 </table>
             </div>
             <!-- Create Table -->
-            <div class="modal fade" id="ajaxModel" aria-hidden="true">
+            <div class="modal fade" id="modalcashier" data-backdrop="static" aria-hidden="true">
                 <div class="modal-dialog">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h4 class="modal-title" id="modelHeading"></h4>
+                            <h4 class="modal-title" id="modalheading"></h4>
+                            <button type="button" class="btn btn-secondary" id="resetmodal" data-dismiss="modal"><i class='fas fa-times'></i> Close</button>
                         </div>
                         <div class="modal-body">
-                            <form method="post" id="cashierform" name="cashierform" enctype="multipart/form-data">
+                            <form method="post" id="formcashier" name="formcashier" enctype="multipart/form-data">
                                 @csrf
-                                <input type="hidden" name="cashierid" id="cashierid">
+                                <input type="hidden" name="id" id="cashierid" value="">
+                                <label for="idcard">Id Card</label>
+                                <div class="form-group">
+                                    <div class="form-line">
+                                        <input type="text" id="idcard" name="idcard" class="form-control"
+                                            placeholder="Enter your Full Name">
+                                    </div>
+                                    <div id="erroridcard"></div>
+                                </div>
                                 <label for="emp">Employee</label>
                                 <div class="form-group">
                                     <div class="input-group">
                                         <div class="input-group-prepend">
                                             <span class="input-group-text"><i class="far fa-id-badge"></i></span>
                                         </div>
-                                        <input type="text" id="emp" name="emp" class="form-control"
-                                            data-inputmask='"mask": "999"' data-mask required>
+                                        <input type="text" id="employee" name="employee" class="form-control">
                                     </div>
+                                    <div id="erroremployee"></div>
                                 </div>
                                 <label for="fullname">Full Name</label>
                                 <div class="form-group">
                                     <div class="form-line">
-                                        <input type="text" id="name" name="name" class="form-control"
-                                            placeholder="Enter your Full Name" required>
+                                        <input type="text" id="fullname" name="fullname" class="form-control"
+                                            placeholder="Enter your Full Name">
                                     </div>
+                                    <div id="errorfullname"></div>
                                 </div>
                                 <label for="birth">Date Of Birth</label>
                                 <div class="form-group">
@@ -96,10 +109,11 @@
                                                 <i class="far fa-calendar-alt"></i>
                                             </span>
                                         </div>
-                                        <input type="text" id="birth" name="birth"
+                                        <input type="text" id="dateofbirth" name="dateofbirth"
                                             class="form-control datetimepicker-input" data-target="#datetimepicker1"
                                             placeholder="dd/mm/yyyy">
                                     </div>
+                                    <div id="errordateofbirth"></div>
                                 </div>
                                 <label for="address">Address</label>
                                 <div class="input-group">
@@ -107,6 +121,7 @@
                                         <textarea rows="2" id="address" name="address" class="form-control no-resize"
                                             placeholder="Please input your Address..."></textarea>
                                     </div>
+                                    <div id="erroraddress"></div>
                                 </div>
                                 <label for="phone">Phone Number</label>
                                 <div class="form-group">
@@ -114,9 +129,9 @@
                                         <div class="input-group-prepend">
                                             <span class="input-group-text"><i class="fas fa-mobile-alt"></i></span>
                                         </div>
-                                        <input type="text" id="phone" name="phone" class="form-control"
-                                            data-inputmask='"mask": "9999-99999999"' data-mask>
+                                        <input type="text" id="phonenumber" name="phonenumber" class="form-control">
                                     </div>
+                                    <div id="errorphonenumber"></div>
                                 </div>
                                 <label for="position">Position</label>
                                 <div class="form-group">
@@ -130,6 +145,7 @@
                                             <option value="Cashier Head">Cashier Head</option>
                                         </select>
                                     </div>
+                                    <div id="errorposition"></div>
                                 </div>
                                 <label for="join">Join Date</label>
                                 <div class="form-group">
@@ -140,29 +156,31 @@
                                                 <i class="far fa-calendar-alt"></i>
                                             </span>
                                         </div>
-                                        <input type="text" id="join" name="join"
+                                        <input type="text" id="joindate" name="joindate"
                                             class="form-control datetimepicker-input" data-target="#datetimepicker2"
                                             placeholder="dd/mm/yyyy">
                                     </div>
+                                    <div id="errorjoindate"></div>
+                                </div>
                                     <label for="position">Status</label>
                                     <div class="form-group">
                                         <div class="form-line">
-                                            <select class="custom-select" id="statuscashier"
-                                                name="statuscashier">
+                                            <select class="custom-select" id="status" name="status">
                                                 <option value="">-- Please select --</option>
                                                 <option value="Active">Active</option>
                                                 <option value="Inactive">Inactive</option>
                                             </select>
                                         </div>
+                                        <div id="errorstatus"></div>
                                     </div>
                                     <label for="image">Select Profile Image</label>
                                     <div class="form-group">
                                         <div class="form-line">
-                                            <input type="file" id="image" name="image" class="form-control">
+                                            <input type="file" id="avatar" name="avatar" class="form-control">
                                         </div>
+                                        <div id="erroravatar"></div>
                                     </div>
-                                    <button type="submit" class="btn btn-primary m-t-15 waves-effect" id="cashiersave"
-                                        value="create">Save</button>
+                                    <button type="submit" class="btn btn-primary m-t-15" id="savecashier">Save</button>
                             </form>
                         </div>
                     </div>
@@ -181,22 +199,31 @@
 @endsection
 
 @section('javascript')
-<!-- InputMask -->
-<script src="{{ asset('dashboard/plugins/inputmask/min/jquery.inputmask.bundle.min.js') }}"></script>
+<!-- jQuery UI -->
+<script src="{{ asset('dashboard/plugins/jquery-ui/jquery-ui.js') }}"></script>
 <!-- Tempusdominus Bootstrap 4 -->
-<script src="{{ asset('plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js') }}"></script>
+<script src="{{ asset('dashboard/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js') }}"></script>
 <!-- page script -->
+@endsection
+
+@push('scripts')
+@error('status')
 <script>
+    $('#modalcashier').modal('show');
+</script>
+@enderror
+<script>
+    $(".preloader").fadeOut("slow");
 function format ( d ) {
     // `d` is the original data object for the row
     return '<table cellpadding="5" cellspacing="0" border="0" style="padding-left:50px;">'+
         '<tr>'+
             '<td>Full name:</td>'+
-            '<td>'+d.FullName+'</td>'+
+            '<td>'+d.idcard+'</td>'+
         '</tr>'+
         '<tr>'+
             '<td>Extension number:</td>'+
-            '<td>'+d.Position+'</td>'+
+            '<td>'+d.address+'</td>'+
         '</tr>'+
         '<tr>'+
             '<td>Extra info:</td>'+
@@ -210,6 +237,8 @@ function format ( d ) {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 }
             });
+
+            var arrayerror = ['idcard','employee','fullname','dateofbirth','address','phonenumber','position','joindate','avatar','status'];
 
             var table = $('#CashierDatatable').DataTable({
             processing: true,
@@ -244,29 +273,31 @@ function format ( d ) {
             [ '10 rows', '25 rows', '50 rows', 'Show all' ]
             ],
             buttons:['pageLength',
-
+                    {
+                        collectionTitle: 'Visibility control',
+                        extend: 'colvis',
+                        collectionLayout: 'two-column'
+                    },
                     {
                         extend: 'collection',
                         text: 'Export',
-                        className: 'btn btn-info',
-                        buttons:[ 'copy', 'csv', 'excel', 'pdf', 'print',
-                                    {
-                                        collectionTitle: 'Visibility control',
-                                        extend: 'colvis',
-                                        collectionLayout: 'two-column'
-                                    }
-                                ]
+                        className: 'btn btn-secondary',
+                        buttons:[ 'copy', 'csv', 'excel', 'pdf', 'print' ]
                     },
                     {
                         text: '<i class="fas fa-user-plus"></i><span> Add Cashier</span>',
-                        className: 'btn btn-success',
+                        className: 'btn btn-secondary',
                         action: function ( e, dt, node, config ) {
-                            $('#cashiersave').val("create-cashier");
-                            $('#cashiersave').html('Save');
+                            for( a=0;a<arrayerror.length;a++)
+                            {
+                                $('#error'+arrayerror[a]).html('');
+                            }
+                            $('#savecashier').val("create-cashier");
+                            $('#savecashier').html('Save');
                             $('#cashierid').val('');
-                            $('#cashierform').trigger("reset");
-                            $('#modelHeading').html("Create New Cashier");
-                            $('#ajaxModel').modal('show');
+                            $('#formcashier').trigger("reset");
+                            $('#modalheading').html("Create New Cashier");
+                            $('#modalcashier').modal('show');
                         }
                     }
                 ]
@@ -289,27 +320,35 @@ function format ( d ) {
             }
         });
 
-        $('#cashierform').on("submit",function (event) {
+        $('#formcashier').on("submit",function (event) {
             event.preventDefault();
-            $('#cashiersave').html('Sending..');
+            $('#savecashier').html('Sending..');
             var formdata = new FormData($(this)[0]);
             $.ajax({
+                data: formdata,
                 url: "{{ route('cashier.store') }}",
                 type: "POST",
-                data: formdata,
+                dataType: 'json',
                 processData: false,
                 contentType: false,
                 success: function (data) {
 
-                    $('#cashierform').trigger("reset");
-                    $('#ajaxModel').modal('hide');
-                    $('#cashiersave').html('Save');
+                    $('#formcashier').trigger("reset");
+                    $('#modalcashier').modal('hide');
+                    $('#savecashier').html('Save');
                     table.draw();
                     swal.fire("Good job!", "You success update Cashier!", "success");
                 },
                 error: function (data) {
                     console.log('Error:', data);
-                    $('#cashiersave').html('Save Changes');
+                    $('#savecashier').html('Save Changes');
+                    for( a=0;a<arrayerror.length;a++)
+                    {
+                        $('#error'+arrayerror[a]).html('');
+                    }
+                    $.each(data.responseJSON.errors, function(key,value) {
+                        $('#error'+key).append('<div class="text-danger mt-2">'+value+'</div');
+                    });
                 }
             });
         });
@@ -319,20 +358,23 @@ function format ( d ) {
             var cashierid = $(this).attr('id');
             $.get("{{ route('cashier.index') }}" +'/' + cashierid +'/edit', function (data)
             {
-                $('#modelHeading').html("Edit Data Cashier");
-                $('#cashiersave').val("edit-cashier");
-                $('#cashiersave').html('Save Changes');
-                $('#ajaxModel').modal('show');
+                for( a=0;a<arrayerror.length;a++)
+                    {
+                        $('#error'+arrayerror[a]).html('');
+                    }
+                $('#modalheading').html("Edit Data Cashier");
+                $('#savecashier').html('Save Changes');
+                $('#modalcashier').modal('show');
                 $('#cashierid').val(data.id);
-                $('#emp').val(data.Employee);
-                $('#name').val(data.FullName);
-                $('#birth').val(data.DateOfBirth);
-                $('#address').val(data.Address);
-                $('#phone').val(data.PhoneNumber);
-                $('#position').val(data.Position);
-                $('#join').val(data.JoinDate);
-                $('#statuscashier').val(data.StatusCashier);
-                $('#image').val(data.Avatar);
+                $('#idcard').val(data.idcard);
+                $('#employee').val(data.employee);
+                $('#fullname').val(data.fullname);
+                $('#dateofbirth').val(data.dateofbirth);
+                $('#address').val(data.address);
+                $('#phonenumber').val(data.phonenumber);
+                $('#position').val(data.position);
+                $('#joindate').val(data.joindate);
+                $('#status').val(data.status);
             })
         });
 
@@ -410,10 +452,28 @@ function format ( d ) {
         $('#datetimepicker2').datetimepicker({
                     format: 'L'
                 });
-        $('[data-mask]').inputmask()
+
+        //Date picker
+        $('#dateinput').datepicker({
+            onSelect: function (dateText, inst) {
+            $('#weekinput').val($.datepicker.iso8601Week(new Date(dateText)));
+            },
+            showWeek: true,
+            firstDay: 1,
+            showOtherMonths: true,
+            selectOtherMonths: true,
+            changeMonth: true,
+            changeYear: true,
+            beforeShowDay: onlymonday
+        });
+        function onlymonday(date){
+        if (date.getDay() === 1)  /* Monday */
+            return [ true, "", "" ]
+        else
+            return [ false, "closed", "Closed on Monday" ]
+        }
 
     });
-    $(".preloader").fadeOut("slow");
 
 </script>
-@endsection
+@endpush

@@ -11,11 +11,6 @@ use Yajra\Datatables\Html\Builder;
 
 class CashierController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function datatable()
     {
         $datacashier = Cashier::latest()->get();
@@ -37,7 +32,6 @@ class CashierController extends Controller
             })
             ->escapeColumns('status')
             ->make(true);
-
     }
 
     public function index(Request $request)
@@ -45,89 +39,75 @@ class CashierController extends Controller
         return view('cashier.cashierdatatable');
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+
     public function create(Request $request)
     {
         //
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
-        if($request->hasFile("image"))
-        {
-        $file= $request->file("image");
-        $imagename =$file->getClientOriginalName();
-        $file->move(public_path().'/images/', $imagename);
+        $idcashier = $request->id;
+        if (!$idcashier) {
+        $attr = $request->validate([
+            'idcard' =>  'required|numeric|unique:cashiers',
+            'employee' => 'required|numeric',
+            'fullname' =>  'required|string',
+            'dateofbirth' => 'required|date',
+            'address' =>  'required',
+            'phonenumber' =>  'required|min:10|unique:cashiers',
+            'position' =>  'required',
+            'joindate' => 'required|date',
+            'status' =>  'required',
+            'avatar' => 'image|max:10000'
+            ]);
         }
-        else
+        else {
+            $attr = $request->validate([
+                'idcard' =>  'required|numeric',
+                'employee' => 'required|numeric',
+                'fullname' =>  'required|string',
+                'dateofbirth' => 'required|date',
+                'address' =>  'required',
+                'phonenumber' =>  'required|min:10',
+                'position' =>  'required',
+                'joindate' => 'required|date',
+                'status' =>  'required',
+                'avatar' => 'image|max:10000'
+                ]);
+        }
+
+        if($request->hasFile("avatar"))
         {
+            $file= $request->file("avatar");
+            $imagename =$file->getClientOriginalName();
+            $file->move(public_path().'/dashboard/img/', $imagename);
+        }
+        else{
             $imagename ="avatar.png";
         }
 
-        $birth = $request->birth;
-        $join = $request->join;
+        $attr["dateofbirth"] = date("Y-m-d",strtotime($attr["dateofbirth"]));
+        $attr["joindate"] = date("Y-m-d",strtotime($attr["joindate"]));
+        $attr["avatar"] = $imagename;
 
-        $newbirth=date("Y-m-d",strtotime($birth));
-        $newjoin=date("Y-m-d",strtotime($join));
-
-        $form_data = array(
-            'Employee' => $request->emp,
-            'FullName' => $request->name,
-            'DateOfBirth' => $newbirth,
-            'Address' => $request->address,
-            'PhoneNumber' => $request->phone,
-            'Position' => $request->position,
-            'JoinDate' => $newjoin,
-            'StatusCashier' => $request->statuscashier,
-            'Avatar' => $imagename
-        );
-
-        Cashier::updateOrCreate(['id'=>$request->cashierid],$form_data);
+        Cashier::updateOrCreate(['id'=>$request->id],$attr);
 
         return response()->json(['success' => 'Data Added successfully.']);
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Cashier  $Cashier
-     * @return \Illuminate\Http\Response
-     */
     public function show($id)
     {
         $data = Cashier::findOrFail($id);
         return view('cashier.cashierprofile',compact('data'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Cashier  $Cashier
-     * @return \Illuminate\Http\Response
-     */
     public function edit($id)
     {
         $data = Cashier::find($id);
         return response()->json($data);
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Cashier  $Cashier
-     * @return \Illuminate\Http\Response
-     */
     public function update($id)
     {
         $data = Cashier::find($id)->update(['status' => 'Inactive',]);
@@ -138,12 +118,6 @@ class CashierController extends Controller
         return response()->json($data);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Cashier  $Cashier
-     * @return \Illuminate\Http\Response
-     */
     public function destroy($id)
     {
         $data = Cashier::findOrFail($id);

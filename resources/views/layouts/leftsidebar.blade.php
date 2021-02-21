@@ -1,5 +1,5 @@
 <!-- Main Sidebar Container -->
-<aside class="main-sidebar main-sidebar-custom sidebar-dark-danger elevation-4">
+<aside class="main-sidebar main-sidebar-custom sidebar-light-danger elevation-4">
     <!-- Brand Logo -->
     <a href="{{ url('admin') }}" class="brand-link navbar-danger">
         <img src="{{ asset('dashboard/img/TPLogo2.png') }}" alt="TP Logo" class="brand-image img-circle elevation-3"

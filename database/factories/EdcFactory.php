@@ -26,6 +26,7 @@ class EdcFactory extends Factory
             'counter_id' =>Counter::factory(),
             'tidedc' => $this->faker->unique()->numberBetween(1,100),
             'midedc' => $this->faker->numberBetween(100000000000000,999999999999999),
+            'serialnumber' => $this->faker->numberBetween(1000000000,9999999999),
             'ipaddress' => $this->faker->numberBetween(1000000000,9999999999),
             'connection' =>$this->faker->randomElement($array = array ('GPRS', 'LAN')),
             'simcard' => $this->faker->randomElement($array = array ('Indosat', 'Telkomsel','XL')),

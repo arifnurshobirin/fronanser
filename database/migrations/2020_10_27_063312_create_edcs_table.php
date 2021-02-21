@@ -18,6 +18,7 @@ class CreateEdcsTable extends Migration
             $table->foreignId('counter_id');
             $table->string('tidedc');
             $table->string('midedc');
+            $table->string('serialnumber')->unique();
             $table->string('ipaddress')->unique();
             $table->string('connection');
             $table->string('simcard');
